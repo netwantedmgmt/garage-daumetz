@@ -109,7 +109,7 @@
       </div>
       <div class="field">
         <label>Immatriculation <span>*</span></label>
-        <input type="text" id="immat" placeholder="AB-123-CD" required>
+        <input type="text" id="immat" placeholder="AB-123-CD" required oninput="this.value=this.value.toUpperCase()">
       </div>
     </div>
 
@@ -136,7 +136,7 @@
       </div>
       <div class="field">
         <label>Kilométrage</label>
-        <input type="text" id="km" placeholder="85 000 km">
+        <input type="number" id="km" placeholder="85000" min="0">
       </div>
     </div>
 
@@ -182,15 +182,24 @@
     <tbody id="devisBody"></tbody>
   </table>
 
-  <div class="total-row">
-    <span>TOTAL HT</span>
-    <span id="totalHT"></span>
+  <div class="total-row" style="flex-direction:column;gap:6px;align-items:stretch;">
+    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;">
+      <span>Total HT</span><span id="totalHT"></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;">
+      <span>TVA 20 %</span><span id="totalTVA"></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:17px;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:2px;">
+      <span>TOTAL TTC</span><span id="totalTTC"></span>
+    </div>
   </div>
+
+  <div id="remarques" style="display:none;background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:12px 14px;font-size:13px;color:#713f12;margin-bottom:16px;"></div>
 
   <div class="result-actions">
     <button class="btn-secondary" onclick="resetForm()">✏️ Modifier</button>
-    <button class="btn-tiime" id="tiimeBtn" onclick="sendToTiime()">
-      📄 Envoyer dans Tiime
+    <button class="btn-tiime" id="tiimeBtn" disabled title="Connexion Tiime en cours de configuration">
+      🔗 Tiime — bientôt disponible
     </button>
   </div>
 
@@ -589,10 +598,21 @@ const WEBHOOK_URL = '/api/devis';
         </tr>`;
     });
 
+    const tva = total * 0.20;
+    const ttc = total + tva;
     document.getElementById('totalHT').textContent = total.toFixed(2) + ' €';
+    document.getElementById('totalTVA').textContent = tva.toFixed(2) + ' €';
+    document.getElementById('totalTTC').textContent = ttc.toFixed(2) + ' €';
+
+    const remarquesEl = document.getElementById('remarques');
+    if (data.remarques) {
+      remarquesEl.textContent = '💡 ' + data.remarques;
+      remarquesEl.style.display = 'block';
+    } else {
+      remarquesEl.style.display = 'none';
+    }
+
     document.getElementById('tiimeStatus').style.display = 'none';
-    document.getElementById('tiimeBtn').disabled = false;
-    document.getElementById('tiimeBtn').innerHTML = '📄 Envoyer dans Tiime';
 
     show('resultCard');
     document.getElementById('resultCard').style.display = 'block';

@@ -36,7 +36,9 @@ Taux horaire main d'œuvre : 65 €/h. Prix HT uniquement. Sépare pièces et ma
     });
 
     const data = await response.json();
-    const text = data.content[0].text.trim();
+    let text = data.content[0].text.trim();
+    // Strip markdown code blocks if Claude added them
+    text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
     const json = JSON.parse(text);
     res.status(200).json(json);
   } catch (err) {

@@ -6,16 +6,39 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const WEBHOOK = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5t1v5';
+  const { client, immat, marque, modele, description, km } = req.body;
+
+  const prompt = `IMPORTANT: Réponds UNIQUEMENT avec du JSON brut valide. Zéro texte avant ou après. Zéro markdown. Zéro \`\`\`json. Juste le JSON.
+
+Tu es un expert en mécanique automobile. Génère un devis pour un garage indépendant français.
+
+Véhicule : ${marque} ${modele} — Immatriculation : ${immat} — Kilométrage : ${km}
+Client : ${client}
+Intervention : ${description}
+
+Taux horaire main d'œuvre : 65 €/h. Prix HT uniquement. Sépare pièces et main d'œuvre. Maximum 10 lignes.
+
+{"lignes":[{"designation":"...","detail":"...","quantite":1,"unite":"forfait","prix_unitaire":0.00}],"remarques":"..."}`;
 
   try {
-    const response = await fetch(WEBHOOK, {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body)
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
     });
+
     const data = await response.json();
-    res.status(200).json(data);
+    const text = data.content[0].text.trim();
+    const json = JSON.parse(text);
+    res.status(200).json(json);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

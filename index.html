@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Génération de devis — Garage D'Aumetz</title>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --purple-light: #a855f7;
+    --dark: #0f172a;
+    --slate: #475569;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --green: #10b981;
+    --red: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 40px; width: 100%; max-width: 560px; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+  .logo-dot { width: 32px; height: 32px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border-radius: 8px; }
+  .logo-text { font-size: 15px; font-weight: 800; color: var(--dark); }
+  .logo-sub { font-size: 12px; color: var(--slate); }
+
+  h1 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: var(--slate); margin-bottom: 32px; line-height: 1.5; }
+
+  .field { margin-bottom: 20px; }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+  label span { color: var(--purple); }
+  input, textarea, select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--dark); background: var(--white); transition: border-color .2s, box-shadow .2s; font-family: inherit; outline: none; }
+  input:focus, textarea:focus, select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+  textarea { resize: vertical; min-height: 100px; }
+  input::placeholder, textarea::placeholder { color: #94a3b8; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: opacity .2s, transform .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn:hover { opacity: .9; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  /* ÉTAT LOADING */
+  .loading { display: none; text-align: center; padding: 40px 0; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { font-size: 14px; color: var(--slate); }
+  .loading .step { font-size: 13px; color: var(--purple); font-weight: 600; margin-top: 6px; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* RÉSULTAT */
+  .result { display: none; }
+  .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .result-icon { width: 36px; height: 36px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .result-header h2 { font-size: 18px; font-weight: 800; }
+  .result-header p { font-size: 13px; color: var(--slate); }
+
+  .devis-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+  .devis-table th { background: var(--bg); padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--slate); border-bottom: 1px solid var(--border); }
+  .devis-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--dark); vertical-align: top; }
+  .devis-table tr:last-child td { border-bottom: none; }
+  .devis-table td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
+
+  .total-row { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 14px 16px; border-radius: 10px; font-weight: 800; font-size: 16px; margin-bottom: 20px; }
+
+  .result-actions { display: flex; gap: 10px; }
+  .btn-secondary { flex: 1; padding: 12px; background: var(--bg); border: 1.5px solid var(--border); color: var(--dark); border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+  .btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-tiime { flex: 2; padding: 12px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-tiime:hover { opacity: .9; }
+  .btn-tiime:disabled { opacity: .5; cursor: not-allowed; }
+
+  .tiime-status { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+  .tiime-status.success { background: #dcfce7; color: #166534; }
+  .tiime-status.error { background: #fee2e2; color: #991b1b; }
+
+  .reset { text-align: center; margin-top: 16px; }
+  .reset button { background: none; border: none; color: var(--slate); font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+  .note { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<div class="card" id="formCard">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <div>
+      <div class="logo-text">Garage D'Aumetz</div>
+      <div class="logo-sub">Générateur de devis automatique</div>
+    </div>
+  </div>
+
+  <h1>Nouveau devis</h1>
+  <p class="subtitle">Décrivez la panne et le véhicule. Le devis se génère automatiquement et s'envoie dans Tiime.</p>
+
+  <form id="devisForm">
+    <div class="row">
+      <div class="field">
+        <label>Nom du client <span>*</span></label>
+        <input type="text" id="client" placeholder="Martin Dupont" required>
+      </div>
+      <div class="field">
+        <label>Immatriculation <span>*</span></label>
+        <input type="text" id="immat" placeholder="AB-123-CD" required>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Marque</label>
+        <input type="text" id="marque" placeholder="Peugeot">
+      </div>
+      <div class="field">
+        <label>Modèle & année</label>
+        <input type="text" id="modele" placeholder="308 — 2019">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Description de la panne / intervention <span>*</span></label>
+      <textarea id="description" placeholder="Ex : Vidange + remplacement plaquettes de frein avant + vérification niveau liquide de frein" required></textarea>
+    </div>
+
+    <div class="field">
+      <label>Kilométrage (optionnel)</label>
+      <input type="text" id="km" placeholder="85 000 km">
+    </div>
+
+    <hr class="divider">
+
+    <button type="submit" class="btn" id="submitBtn">
+      ⚡ Générer le devis
+    </button>
+  </form>
+</div>
+
+<!-- LOADING -->
+<div class="card loading" id="loadingCard">
+  <div class="spinner"></div>
+  <p>Génération du devis en cours...</p>
+  <div class="step" id="loadingStep">Analyse de la panne</div>
+</div>
+
+<!-- RÉSULTAT -->
+<div class="card result" id="resultCard">
+  <div class="result-header">
+    <div class="result-icon">✅</div>
+    <div>
+      <h2>Devis généré</h2>
+      <p id="resultMeta"></p>
+    </div>
+  </div>
+
+  <table class="devis-table" id="devisTable">
+    <thead>
+      <tr>
+        <th>Prestation</th>
+        <th>Qté</th>
+        <th>P.U. HT</th>
+        <th>Total HT</th>
+      </tr>
+    </thead>
+    <tbody id="devisBody"></tbody>
+  </table>
+
+  <div class="total-row">
+    <span>TOTAL HT</span>
+    <span id="totalHT"></span>
+  </div>
+
+  <div class="result-actions">
+    <button class="btn-secondary" onclick="resetForm()">✏️ Modifier</button>
+    <button class="btn-tiime" id="tiimeBtn" onclick="sendToTiime()">
+      📄 Envoyer dans Tiime
+    </button>
+  </div>
+
+  <div class="tiime-status" id="tiimeStatus"></div>
+
+  <div class="reset">
+    <button onclick="resetForm()">Nouveau devis</button>
+  </div>
+</div>
+
+<p class="note">Propulsé par Netwanted · Les prix sont des estimations — vérifiez avant envoi au client</p>
+
+<script>
+  const WEBHOOK_URL = 'VOTRE_WEBHOOK_MAKE_ICI'; // À remplacer par l'URL Make.com
+
+  let currentDevis = null;
+
+  const steps = [
+    'Analyse de la panne...',
+    'Identification des pièces...',
+    'Calcul des prix...',
+    'Mise en forme du devis...'
+  ];
+  let stepIndex = 0;
+  let stepInterval;
+
+  function startStepAnimation() {
+    stepIndex = 0;
+    document.getElementById('loadingStep').textContent = steps[0];
+    stepInterval = setInterval(() => {
+      stepIndex = (stepIndex + 1) % steps.length;
+      document.getElementById('loadingStep').textContent = steps[stepIndex];
+    }, 1800);
+  }
+
+  function stopStepAnimation() {
+    clearInterval(stepInterval);
+  }
+
+  function show(id) {
+    ['formCard', 'loadingCard', 'resultCard'].forEach(c => {
+      document.getElementById(c).style.display = c === id ? 'block' : 'none';
+    });
+    if (id === 'loadingCard') {
+      document.getElementById('loadingCard').style.display = 'flex';
+      document.getElementById('loadingCard').style.flexDirection = 'column';
+      document.getElementById('loadingCard').style.alignItems = 'center';
+    }
+  }
+
+  document.getElementById('devisForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      client: document.getElementById('client').value,
+      immat: document.getElementById('immat').value,
+      marque: document.getElementById('marque').value,
+      modele: document.getElementById('modele').value,
+      description: document.getElementById('description').value,
+      km: document.getElementById('km').value,
+    };
+
+    show('loadingCard');
+    startStepAnimation();
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      stopStepAnimation();
+      displayResult(payload, data);
+    } catch (err) {
+      stopStepAnimation();
+      alert('Erreur lors de la génération. Vérifiez votre connexion.');
+      show('formCard');
+    }
+  });
+
+  function displayResult(input, data) {
+    currentDevis = { input, data };
+
+    document.getElementById('resultMeta').textContent =
+      `${input.client} · ${input.marque} ${input.modele} · ${input.immat}`;
+
+    const tbody = document.getElementById('devisBody');
+    tbody.innerHTML = '';
+
+    let total = 0;
+    data.lignes.forEach(ligne => {
+      const lineTotal = ligne.quantite * ligne.prix_unitaire;
+      total += lineTotal;
+      tbody.innerHTML += `
+        <tr>
+          <td>
+            <strong>${ligne.designation}</strong><br>
+            <span style="font-size:11px;color:#94a3b8;">${ligne.detail || ''}</span>
+          </td>
+          <td>${ligne.quantite}</td>
+          <td>${ligne.prix_unitaire.toFixed(2)} €</td>
+          <td>${lineTotal.toFixed(2)} €</td>
+        </tr>`;
+    });
+
+    document.getElementById('totalHT').textContent = total.toFixed(2) + ' €';
+    document.getElementById('tiimeStatus').style.display = 'none';
+    document.getElementById('tiimeBtn').disabled = false;
+    document.getElementById('tiimeBtn').innerHTML = '📄 Envoyer dans Tiime';
+
+    show('resultCard');
+    document.getElementById('resultCard').style.display = 'block';
+  }
+
+  async function sendToTiime() {
+    const btn = document.getElementById('tiimeBtn');
+    const status = document.getElementById('tiimeStatus');
+
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Envoi en cours...';
+
+    try {
+      const res = await fetch(WEBHOOK_URL + '?action=tiime', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentDevis)
+      });
+      const data = await res.json();
+
+      status.style.display = 'block';
+      if (data.tiime_url) {
+        status.className = 'tiime-status success';
+        status.innerHTML = `✅ Devis créé dans Tiime — <a href="${data.tiime_url}" target="_blank" style="color:inherit;">Ouvrir le devis</a>`;
+      } else {
+        status.className = 'tiime-status success';
+        status.textContent = '✅ Devis envoyé dans Tiime avec succès';
+      }
+      btn.innerHTML = '✅ Envoyé';
+    } catch (err) {
+      status.style.display = 'block';
+      status.className = 'tiime-status error';
+      status.textContent = '❌ Erreur lors de l\'envoi. Réessayez.';
+      btn.disabled = false;
+      btn.innerHTML = '📄 Envoyer dans Tiime';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('devisForm').reset();
+    currentDevis = null;
+    show('formCard');
+  }
+
+  show('formCard');
+</script>
+
+</body>
+</html>

@@ -221,8 +221,8 @@
 
   <div class="result-actions">
     <button class="btn-secondary" onclick="resetForm()">✏️ Modifier</button>
-    <button class="btn-tiime" id="tiimeBtn" disabled title="Connexion Tiime en cours de configuration">
-      🔗 Tiime — bientôt disponible
+    <button class="btn-tiime" id="tiimeBtn" onclick="sendToTiime()">
+      🔗 Envoyer dans Tiime
     </button>
   </div>
 
@@ -523,6 +523,7 @@ function updateAnnees() {
 initMarques();
 
 const WEBHOOK_URL = '/api/devis';
+const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5t1v5';
 
   let currentDevis = null;
 
@@ -651,7 +652,7 @@ const WEBHOOK_URL = '/api/devis';
     btn.innerHTML = '⏳ Envoi en cours...';
 
     try {
-      const res = await fetch(WEBHOOK_URL + '?action=tiime', {
+      const res = await fetch(MAKE_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(currentDevis)

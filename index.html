@@ -657,17 +657,15 @@ const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(currentDevis)
       });
-      const data = await res.json();
 
       status.style.display = 'block';
-      if (data.tiime_url) {
-        status.className = 'tiime-status success';
-        status.innerHTML = `✅ Devis créé dans Tiime — <a href="${data.tiime_url}" target="_blank" style="color:inherit;">Ouvrir le devis</a>`;
-      } else {
+      if (res.ok) {
         status.className = 'tiime-status success';
         status.textContent = '✅ Devis envoyé dans Tiime avec succès';
+        btn.innerHTML = '✅ Envoyé';
+      } else {
+        throw new Error('HTTP ' + res.status);
       }
-      btn.innerHTML = '✅ Envoyé';
     } catch (err) {
       status.style.display = 'block';
       status.className = 'tiime-status error';

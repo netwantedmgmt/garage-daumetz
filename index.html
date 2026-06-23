@@ -108,8 +108,21 @@
         <input type="text" id="client" placeholder="Martin Dupont" required>
       </div>
       <div class="field">
+        <label>Type de client <span>*</span></label>
+        <select id="typeClient" required>
+          <option value="individual">Particulier</option>
+          <option value="company">Entreprise</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
         <label>Immatriculation <span>*</span></label>
         <input type="text" id="immat" placeholder="AB-123-CD" required oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="field">
+        <label>Kilométrage</label>
+        <input type="number" id="km" placeholder="85000" min="0">
       </div>
     </div>
 
@@ -134,10 +147,7 @@
           <option value="">— Choisir un modèle —</option>
         </select>
       </div>
-      <div class="field">
-        <label>Kilométrage</label>
-        <input type="number" id="km" placeholder="85000" min="0">
-      </div>
+      <div class="field"></div>
     </div>
 
     <div class="field">
@@ -541,6 +551,7 @@ const WEBHOOK_URL = '/api/devis';
 
     const payload = {
       client: document.getElementById('client').value,
+      typeClient: document.getElementById('typeClient').value,
       immat: document.getElementById('immat').value,
       marque: document.getElementById('marque').value,
       modele: document.getElementById('modele').value,

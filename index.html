@@ -680,6 +680,10 @@ const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5
   function resetForm() {
     document.getElementById('devisForm').reset();
     currentDevis = null;
+    const btn = document.getElementById('tiimeBtn');
+    btn.disabled = false;
+    btn.innerHTML = '🔗 Envoyer dans Tiime';
+    document.getElementById('tiimeStatus').style.display = 'none';
     show('formCard');
   }
 

@@ -147,7 +147,20 @@
           <option value="">— Choisir un modèle —</option>
         </select>
       </div>
-      <div class="field"></div>
+      <div class="field">
+        <label>Pays <span>*</span></label>
+        <select id="pays" required>
+          <option value="FR">France</option>
+          <option value="BE">Belgique</option>
+          <option value="LU">Luxembourg</option>
+          <option value="DE">Allemagne</option>
+          <option value="CH">Suisse</option>
+          <option value="NL">Pays-Bas</option>
+          <option value="ES">Espagne</option>
+          <option value="IT">Italie</option>
+          <option value="PT">Portugal</option>
+        </select>
+      </div>
     </div>
 
     <div class="field">
@@ -552,6 +565,7 @@ const WEBHOOK_URL = '/api/devis';
     const payload = {
       client: document.getElementById('client').value,
       typeClient: document.getElementById('typeClient').value,
+      pays: document.getElementById('pays').value,
       immat: document.getElementById('immat').value,
       marque: document.getElementById('marque').value,
       modele: document.getElementById('modele').value,

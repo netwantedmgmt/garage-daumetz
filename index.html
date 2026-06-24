@@ -148,6 +148,12 @@
         </select>
       </div>
       <div class="field">
+        <label>Motorisation</label>
+        <input type="text" id="motorisation" placeholder="ex: 2.0 TDI, 3.0 TFSI, 1.6 HDi…">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
         <label>Carburant <span>*</span></label>
         <select id="carburant" required>
           <option value="Essence">Essence</option>
@@ -587,6 +593,7 @@ const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5
       marque: document.getElementById('marque').value,
       modele: document.getElementById('modele').value,
       annee: document.getElementById('annee').value,
+      motorisation: document.getElementById('motorisation').value,
       carburant: document.getElementById('carburant').value,
       description: document.getElementById('description').value,
       km: document.getElementById('km').value,

@@ -6,13 +6,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { client, immat, marque, modele, carburant, description, km } = req.body;
+  const { client, immat, marque, modele, motorisation, carburant, description, km } = req.body;
 
   const prompt = `IMPORTANT: Réponds UNIQUEMENT avec du JSON brut valide. Zéro texte avant ou après. Zéro markdown. Zéro \`\`\`json. Juste le JSON.
 
 Tu es un expert en mécanique automobile. Génère un devis pour un garage indépendant français.
 
-Véhicule : ${marque} ${modele} (${carburant || 'carburant inconnu'}) — Immatriculation : ${immat} — Kilométrage : ${km}
+Véhicule : ${marque} ${modele}${motorisation ? ` — Motorisation : ${motorisation}` : ''} (${carburant || 'carburant inconnu'}) — Immatriculation : ${immat} — Kilométrage : ${km}
 Client : ${client}
 Intervention : ${description}
 

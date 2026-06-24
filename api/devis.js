@@ -17,9 +17,9 @@ Client : ${client}
 Intervention : ${description}
 
 Taux horaire main d'œuvre : 65 €/h. Prix HT uniquement. Sépare pièces et main d'œuvre. Maximum 10 lignes.
-Pour le champ "unite", utilise UNIQUEMENT ces valeurs exactes : "Heures" (main d'œuvre), "Articles" (pièces/fournitures), "Forfaits" (forfait), "Litres" (liquides), "Mètres" (si applicable).
+Pour le champ "quote_quantity_unit_of_measure_code", utilise UNIQUEMENT ces valeurs exactes : "heure" (main d'œuvre/travail), "article" (pièces/fournitures), "forfait" (prestation forfaitaire), "litre" (liquides/fluides).
 
-{"lignes":[{"designation":"...","detail":"...","quantite":1,"unite":"Forfaits","prix_unitaire":0.00}],"remarques":"..."}`;
+{"lignes":[{"designation":"...","detail":"...","quantite":1,"quote_quantity_unit_of_measure_code":"article","prix_unitaire":0.00}],"remarques":"..."}`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {

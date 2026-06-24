@@ -148,6 +148,19 @@
         </select>
       </div>
       <div class="field">
+        <label>Carburant <span>*</span></label>
+        <select id="carburant" required>
+          <option value="Essence">Essence</option>
+          <option value="Diesel">Diesel</option>
+          <option value="Hybride">Hybride</option>
+          <option value="Hybride rechargeable">Hybride rechargeable</option>
+          <option value="Électrique">Électrique</option>
+          <option value="GPL">GPL / GNV</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field" style="max-width:50%">
         <label>Pays <span>*</span></label>
         <select id="pays" required>
           <option value="FR">France</option>
@@ -462,7 +475,10 @@ const VOITURES = {
     "Amarok": y(2010,2023), "Arteon": y(2017,2023), "Beetle": y(1938,2019),
     "Caddy": y(1980,2023), "California": y(1988,2023), "Caravelle": y(1950,2023),
     "CC": y(2008,2017), "Crafter": y(2006,2023), "Fox": y(2003,2011),
-    "Golf": y(1974,2023), "ID.3": y(2020,2023), "ID.4": y(2020,2023),
+    "Golf": y(1974,2023), "Golf GTI": y(1976,2023), "Golf GTD": y(2003,2023),
+    "Golf R": y(2002,2023), "Golf GTE": y(2014,2023), "Golf Plus": y(2004,2014),
+    "Golf Variant": y(1993,2023), "Golf Cabriolet": y(1979,2016),
+    "ID.3": y(2020,2023), "ID.4": y(2020,2023),
     "ID.5": y(2021,2023), "Jetta": y(1979,2023), "Lupo": y(1998,2005),
     "Passat": y(1973,2023), "Phaeton": y(2002,2016), "Polo": y(1975,2023),
     "Scirocco": y(1974,2017), "Sharan": y(1995,2022), "T-Cross": y(2018,2023),
@@ -571,6 +587,7 @@ const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5
       marque: document.getElementById('marque').value,
       modele: document.getElementById('modele').value,
       annee: document.getElementById('annee').value,
+      carburant: document.getElementById('carburant').value,
       description: document.getElementById('description').value,
       km: document.getElementById('km').value,
     };

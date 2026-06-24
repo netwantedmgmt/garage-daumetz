@@ -610,16 +610,16 @@ const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5
 
     let total = 0;
     data.lignes.forEach(ligne => {
-      const lineTotal = ligne.quantite * ligne.prix_unitaire;
+      const lineTotal = ligne.quote_quantity * ligne.item_net_price;
       total += lineTotal;
       tbody.innerHTML += `
         <tr>
           <td>
-            <strong>${ligne.designation}</strong><br>
+            <strong>${ligne.item_name}</strong><br>
             <span style="font-size:11px;color:#94a3b8;">${ligne.detail || ''}</span>
           </td>
-          <td>${ligne.quantite}</td>
-          <td>${ligne.prix_unitaire.toFixed(2)} €</td>
+          <td>${ligne.quote_quantity}</td>
+          <td>${ligne.item_net_price.toFixed(2)} €</td>
           <td>${lineTotal.toFixed(2)} €</td>
         </tr>`;
     });

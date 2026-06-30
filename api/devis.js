@@ -23,7 +23,8 @@ Taux horaire main d'œuvre selon le type d'intervention :
 - T2 = 70€/h : diagnostic & mécanique technique (distribution, embrayage, suspension, diagnostic électronique, recherche de panne, climatisation)
 - T3 = 90€/h : intervention lourde & expertise (gros démontage moteur, boîte de vitesses, soudure, panne complexe, interventions spécifiques)
 
-Applique le bon taux selon la nature de chaque ligne de main d'œuvre. Les pièces sont facturées au prix catalogue.
+Applique le bon taux selon la nature de chaque ligne de main d'œuvre.
+Les pièces et fournitures sont facturées avec une marge de 35 à 50% sur le prix d'achat fournisseur. Le garage utilise des produits de qualité (pas du bas de gamme) : huiles longlife de marque (Castrol, Liqui-Moly, Mobil), filtres de qualité, pièces d'origine ou équivalent OEM. L'objectif est un devis rentable et professionnel, pas le moins cher du marché.
 Pour le champ "quote_quantity_unit_of_measure_code", utilise UNIQUEMENT ces valeurs exactes : "heure" (main d'œuvre/travail), "article" (pièces/fournitures), "forfait" (prestation forfaitaire), "litre" (liquides/fluides).
 
 {"lignes":[{"item_name":"...","detail":"...","quote_quantity":1,"quote_quantity_unit_of_measure_code":"article","item_net_price":0.00}],"remarques":"..."}`;

@@ -5,90 +5,97 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Génération de devis — Garage D'Aumetz</title>
 <style>
-  :root {
-    --purple: #7c3aed;
-    --purple-light: #a855f7;
-    --dark: #0f172a;
-    --slate: #475569;
-    --border: #e2e8f0;
-    --bg: #f8fafc;
-    --white: #ffffff;
-    --green: #10b981;
-    --red: #ef4444;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-
-  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 40px; width: 100%; max-width: 560px; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
-
-  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-  .logo-dot { width: 32px; height: 32px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border-radius: 8px; }
-  .logo-text { font-size: 15px; font-weight: 800; color: var(--dark); }
-  .logo-sub { font-size: 12px; color: var(--slate); }
-
-  h1 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
-  .subtitle { font-size: 14px; color: var(--slate); margin-bottom: 32px; line-height: 1.5; }
-
-  .field { margin-bottom: 20px; }
-  label { display: block; font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
-  label span { color: var(--purple); }
-  input, textarea, select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--dark); background: var(--white); transition: border-color .2s, box-shadow .2s; font-family: inherit; outline: none; }
-  input:focus, textarea:focus, select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
-  textarea { resize: vertical; min-height: 100px; }
-  input::placeholder, textarea::placeholder { color: #94a3b8; }
-
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-
-  .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: opacity .2s, transform .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn:hover { opacity: .9; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-
-  /* ÉTAT LOADING */
-  .loading { display: none; text-align: center; padding: 40px 0; }
-  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading p { font-size: 14px; color: var(--slate); }
-  .loading .step { font-size: 13px; color: var(--purple); font-weight: 600; margin-top: 6px; animation: pulse 1.5s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-
-  /* RÉSULTAT */
-  .result { display: none; }
-  .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-  .result-icon { width: 36px; height: 36px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .result-header h2 { font-size: 18px; font-weight: 800; }
-  .result-header p { font-size: 13px; color: var(--slate); }
-
-  .devis-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
-  .devis-table th { background: var(--bg); padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--slate); border-bottom: 1px solid var(--border); }
-  .devis-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--dark); vertical-align: top; }
-  .devis-table tr:last-child td { border-bottom: none; }
-  .devis-table td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
-
-  .total-row { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 14px 16px; border-radius: 10px; font-weight: 800; font-size: 16px; margin-bottom: 20px; }
-
-  .result-actions { display: flex; gap: 10px; }
-  .btn-secondary { flex: 1; padding: 12px; background: var(--bg); border: 1.5px solid var(--border); color: var(--dark); border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
-  .btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
-  .btn-tiime { flex: 2; padding: 12px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-tiime:hover { opacity: .9; }
-  .btn-tiime:disabled { opacity: .5; cursor: not-allowed; }
-
-  .tiime-status { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
-  .tiime-status.success { background: #dcfce7; color: #166534; }
-  .tiime-status.error { background: #fee2e2; color: #991b1b; }
-
-  .reset { text-align: center; margin-top: 16px; }
-  .reset button { background: none; border: none; color: var(--slate); font-size: 13px; cursor: pointer; text-decoration: underline; }
-
-  .note { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 24px; }
+:root {
+  --purple: #7c3aed;
+  --purple-light: #a855f7;
+  --dark: #0f172a;
+  --slate: #475569;
+  --border: #e2e8f0;
+  --bg: #f8fafc;
+  --white: #ffffff;
+  --green: #10b981;
+  --red: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 40px; width: 100%; max-width: 560px; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.logo-text { font-size: 15px; font-weight: 800; color: var(--dark); }
+.logo-sub { font-size: 12px; color: var(--slate); }
+/* Progress */
+.progress { display: flex; align-items: flex-start; margin-bottom: 32px; }
+.prog-step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.prog-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--slate); transition: all .3s; }
+.prog-dot.active { background: var(--purple); border-color: var(--purple); color: white; }
+.prog-dot.done { background: var(--green); border-color: var(--green); color: white; font-size: 11px; }
+.prog-label { font-size: 11px; color: var(--slate); font-weight: 600; white-space: nowrap; }
+.prog-label.active { color: var(--purple); }
+.prog-line { flex: 1; height: 2px; background: var(--border); margin: 15px 8px 0; transition: background .3s; }
+.prog-line.done { background: var(--green); }
+/* Fields */
+.step-title { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.step-sub { font-size: 13px; color: var(--slate); margin-bottom: 24px; }
+.field { margin-bottom: 16px; }
+label { display: block; font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+label span { color: var(--purple); }
+input, textarea, select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--dark); background: var(--white); transition: border-color .2s, box-shadow .2s; font-family: inherit; outline: none; }
+input:focus, textarea:focus, select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+textarea { resize: vertical; min-height: 130px; }
+input::placeholder, textarea::placeholder { color: #94a3b8; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* Type client */
+.type-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.type-btn { padding: 14px 10px; border: 2px solid var(--border); border-radius: 12px; background: white; cursor: pointer; text-align: center; transition: all .2s; font-family: inherit; }
+.type-btn:hover { border-color: var(--purple); }
+.type-btn.selected { border-color: var(--purple); background: rgba(124,58,237,.05); }
+.type-icon { font-size: 22px; margin-bottom: 4px; }
+.type-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+.type-desc { font-size: 11px; color: var(--slate); }
+/* Nav */
+.nav { display: flex; gap: 10px; margin-top: 24px; }
+.btn-back { padding: 13px 20px; background: var(--bg); border: 1.5px solid var(--border); color: var(--dark); border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; white-space: nowrap; }
+.btn-back:hover { border-color: var(--purple); color: var(--purple); }
+.btn-next { flex: 1; padding: 14px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: opacity .2s, transform .2s; font-family: inherit; }
+.btn-next:hover { opacity: .9; transform: translateY(-1px); }
+.btn-next:active { transform: translateY(0); }
+.step-content { animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
+/* Loading */
+.loading { display: none; text-align: center; padding: 40px 0; }
+.spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-size: 14px; color: var(--slate); }
+.loading .step { font-size: 13px; color: var(--purple); font-weight: 600; margin-top: 6px; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+/* Result */
+.result { display: none; }
+.result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.result-icon { width: 36px; height: 36px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.result-header h2 { font-size: 18px; font-weight: 800; }
+.result-header p { font-size: 13px; color: var(--slate); }
+.devis-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+.devis-table th { background: var(--bg); padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--slate); border-bottom: 1px solid var(--border); }
+.devis-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--dark); vertical-align: top; }
+.devis-table tr:last-child td { border-bottom: none; }
+.devis-table td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
+.total-row { background: var(--dark); color: white; padding: 14px 16px; border-radius: 10px; font-weight: 800; font-size: 16px; margin-bottom: 20px; }
+.result-actions { display: flex; gap: 10px; }
+.btn-secondary { flex: 1; padding: 12px; background: var(--bg); border: 1.5px solid var(--border); color: var(--dark); border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+.btn-tiime { flex: 2; padding: 12px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-tiime:hover { opacity: .9; }
+.btn-tiime:disabled { opacity: .5; cursor: not-allowed; }
+.tiime-status { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+.tiime-status.success { background: #dcfce7; color: #166534; }
+.tiime-status.error { background: #fee2e2; color: #991b1b; }
+.reset { text-align: center; margin-top: 16px; }
+.reset button { background: none; border: none; color: var(--slate); font-size: 13px; cursor: pointer; text-decoration: underline; }
+.note { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 24px; }
 </style>
 </head>
 <body>
 
+<!-- WIZARD -->
 <div class="card" id="formCard">
   <div class="logo">
     <img src="gda.png" alt="Garage D'Aumetz" style="height:64px;width:auto;">
@@ -98,44 +105,90 @@
     </div>
   </div>
 
-  <h1>Nouveau devis</h1>
-  <p class="subtitle">Décrivez la panne et le véhicule. Le devis se génère automatiquement et s'envoie dans Tiime.</p>
-
-  <form id="devisForm">
-    <div class="row">
-      <div class="field">
-        <label>Nom du client <span>*</span></label>
-        <input type="text" id="client" placeholder="Martin Dupont" required>
-      </div>
-      <div class="field">
-        <label>Type de client <span>*</span></label>
-        <select id="typeClient" required>
-          <option value="individual">Particulier</option>
-          <option value="company">Entreprise</option>
-        </select>
-      </div>
+  <div class="progress">
+    <div class="prog-step">
+      <div class="prog-dot active" id="dot1">1</div>
+      <div class="prog-label active" id="lbl1">Client</div>
     </div>
+    <div class="prog-line" id="line1"></div>
+    <div class="prog-step">
+      <div class="prog-dot" id="dot2">2</div>
+      <div class="prog-label" id="lbl2">Véhicule</div>
+    </div>
+    <div class="prog-line" id="line2"></div>
+    <div class="prog-step">
+      <div class="prog-dot" id="dot3">3</div>
+      <div class="prog-label" id="lbl3">Intervention</div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1" class="step-content">
+    <div class="step-title">Client</div>
+    <div class="step-sub">Informations du client</div>
+    <div class="field">
+      <label>Nom complet <span>*</span></label>
+      <input type="text" id="client" placeholder="Martin Dupont">
+    </div>
+    <div class="field">
+      <label>Type de client</label>
+      <div class="type-btns">
+        <button type="button" class="type-btn selected" id="btn-individual" onclick="selectType('individual')">
+          <div class="type-icon">👤</div>
+          <div class="type-name">Particulier</div>
+          <div class="type-desc">Client individuel</div>
+        </button>
+        <button type="button" class="type-btn" id="btn-company" onclick="selectType('company')">
+          <div class="type-icon">🏢</div>
+          <div class="type-name">Entreprise</div>
+          <div class="type-desc">Client professionnel</div>
+        </button>
+      </div>
+      <input type="hidden" id="typeClient" value="individual">
+    </div>
+    <div class="field">
+      <label>Pays</label>
+      <select id="pays">
+        <option value="FR">France</option>
+        <option value="BE">Belgique</option>
+        <option value="LU">Luxembourg</option>
+        <option value="DE">Allemagne</option>
+        <option value="CH">Suisse</option>
+        <option value="NL">Pays-Bas</option>
+        <option value="ES">Espagne</option>
+        <option value="IT">Italie</option>
+        <option value="PT">Portugal</option>
+      </select>
+    </div>
+    <div class="nav">
+      <button type="button" class="btn-next" onclick="goStep(2)">Suivant — Véhicule →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="step-content" style="display:none">
+    <div class="step-title">Véhicule</div>
+    <div class="step-sub">Identification du véhicule</div>
     <div class="row">
       <div class="field">
         <label>Immatriculation <span>*</span></label>
-        <input type="text" id="immat" placeholder="AB-123-CD" required oninput="this.value=this.value.toUpperCase()">
+        <input type="text" id="immat" placeholder="AB-123-CD" oninput="this.value=this.value.toUpperCase()">
       </div>
       <div class="field">
         <label>Kilométrage</label>
         <input type="number" id="km" placeholder="85000" min="0">
       </div>
     </div>
-
     <div class="row">
       <div class="field">
         <label>Marque <span>*</span></label>
-        <select id="marque" required onchange="updateModeles()">
+        <select id="marque" onchange="updateModeles()">
           <option value="">— Sélectionner —</option>
         </select>
       </div>
       <div class="field">
         <label>Modèle <span>*</span></label>
-        <select id="modele" required onchange="updateAnnees()" disabled>
+        <select id="modele" onchange="updateAnnees();updateMotorisations()" disabled>
           <option value="">— Choisir une marque —</option>
         </select>
       </div>
@@ -143,19 +196,13 @@
     <div class="row">
       <div class="field">
         <label>Année <span>*</span></label>
-        <select id="annee" required disabled>
+        <select id="annee" disabled>
           <option value="">— Choisir un modèle —</option>
         </select>
       </div>
       <div class="field">
-        <label>Motorisation</label>
-        <input type="text" id="motorisation" placeholder="ex: 2.0 TDI, 3.0 TFSI, 1.6 HDi…">
-      </div>
-    </div>
-    <div class="row">
-      <div class="field">
-        <label>Carburant <span>*</span></label>
-        <select id="carburant" required>
+        <label>Carburant</label>
+        <select id="carburant">
           <option value="Essence">Essence</option>
           <option value="Diesel">Diesel</option>
           <option value="Hybride">Hybride</option>
@@ -165,34 +212,30 @@
         </select>
       </div>
     </div>
-    <div class="row">
-      <div class="field" style="max-width:50%">
-        <label>Pays <span>*</span></label>
-        <select id="pays" required>
-          <option value="FR">France</option>
-          <option value="BE">Belgique</option>
-          <option value="LU">Luxembourg</option>
-          <option value="DE">Allemagne</option>
-          <option value="CH">Suisse</option>
-          <option value="NL">Pays-Bas</option>
-          <option value="ES">Espagne</option>
-          <option value="IT">Italie</option>
-          <option value="PT">Portugal</option>
-        </select>
-      </div>
-    </div>
-
     <div class="field">
-      <label>Description de la panne / intervention <span>*</span></label>
-      <textarea id="description" placeholder="Ex : Vidange + remplacement plaquettes de frein avant + vérification niveau liquide de frein" required></textarea>
+      <label>Motorisation</label>
+      <input type="text" id="motorisation" list="motorisation-list" placeholder="ex: 2.0 TDI 150ch — ou tapez librement" autocomplete="off">
+      <datalist id="motorisation-list"></datalist>
     </div>
+    <div class="nav">
+      <button type="button" class="btn-back" onclick="goStep(1)">← Retour</button>
+      <button type="button" class="btn-next" onclick="goStep(3)">Suivant — Intervention →</button>
+    </div>
+  </div>
 
-    <hr class="divider">
-
-    <button type="submit" class="btn" id="submitBtn">
-      ⚡ Générer le devis
-    </button>
-  </form>
+  <!-- STEP 3 -->
+  <div id="step3" class="step-content" style="display:none">
+    <div class="step-title">Intervention</div>
+    <div class="step-sub">Décrivez la panne ou l'intervention souhaitée</div>
+    <div class="field">
+      <label>Description <span>*</span></label>
+      <textarea id="description" placeholder="Ex : Vidange + remplacement plaquettes de frein avant + vérification niveau liquide de frein"></textarea>
+    </div>
+    <div class="nav">
+      <button type="button" class="btn-back" onclick="goStep(2)">← Retour</button>
+      <button type="button" class="btn-next" onclick="submitDevis()">⚡ Générer le devis</button>
+    </div>
+  </div>
 </div>
 
 <!-- LOADING -->
@@ -211,297 +254,372 @@
       <p id="resultMeta"></p>
     </div>
   </div>
-
-  <table class="devis-table" id="devisTable">
-    <thead>
-      <tr>
-        <th>Prestation</th>
-        <th>Qté</th>
-        <th>P.U. HT</th>
-        <th>Total HT</th>
-      </tr>
-    </thead>
+  <table class="devis-table">
+    <thead><tr><th>Prestation</th><th>Qté</th><th>P.U. HT</th><th>Total HT</th></tr></thead>
     <tbody id="devisBody"></tbody>
   </table>
-
-  <div class="total-row" style="flex-direction:column;gap:6px;align-items:stretch;">
-    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;">
-      <span>Total HT</span><span id="totalHT"></span>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;">
-      <span>TVA 20 %</span><span id="totalTVA"></span>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:17px;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:2px;">
-      <span>TOTAL TTC</span><span id="totalTTC"></span>
-    </div>
+  <div class="total-row" style="display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;"><span>Total HT</span><span id="totalHT"></span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px;opacity:.75;"><span>TVA 20 %</span><span id="totalTVA"></span></div>
+    <div style="display:flex;justify-content:space-between;font-size:17px;border-top:1px solid rgba(255,255,255,.25);padding-top:8px;margin-top:2px;"><span>TOTAL TTC</span><span id="totalTTC"></span></div>
   </div>
-
   <div id="remarques" style="display:none;background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:12px 14px;font-size:13px;color:#713f12;margin-bottom:16px;"></div>
-
   <div class="result-actions">
     <button class="btn-secondary" onclick="resetForm()">✏️ Modifier</button>
-    <button class="btn-tiime" id="tiimeBtn" onclick="sendToTiime()">
-      🔗 Envoyer dans Tiime
-    </button>
+    <button class="btn-tiime" id="tiimeBtn" onclick="sendToTiime()">🔗 Envoyer dans Tiime</button>
   </div>
-
   <div class="tiime-status" id="tiimeStatus"></div>
-
-  <div class="reset">
-    <button onclick="resetForm()">Nouveau devis</button>
-  </div>
+  <div class="reset"><button onclick="resetForm()">Nouveau devis</button></div>
 </div>
 
 <p class="note">Propulsé par Netwanted · Les prix sont des estimations — vérifiez avant envoi au client</p>
 
 <script>
-// ─── UTILITAIRE : génère un tableau d'années [start..end] ───
 const y = (s,e) => Array.from({length:e-s+1},(_,i)=>s+i);
 
-// ─── BASE DE DONNÉES VÉHICULES (marques × modèles × années) ───
 const VOITURES = {
-  "Alfa Romeo": {
-    "145": y(1994,2001), "146": y(1994,2001), "147": y(2001,2010), "156": y(1997,2007),
-    "159": y(2005,2012), "166": y(1998,2007), "Brera": y(2005,2010), "GTV": y(1994,2005),
-    "Giulia": y(2016,2023), "Giulietta": y(2010,2020), "MiTo": y(2008,2018),
-    "Spider": y(1994,2005), "Stelvio": y(2017,2023), "Tonale": y(2022,2023)
-  },
-  "Audi": {
-    "A1": y(2010,2023), "A2": y(1999,2005), "A3": y(1996,2023), "A4": y(1994,2023),
-    "A5": y(2007,2023), "A6": y(1994,2023), "A7": y(2010,2023), "A8": y(1994,2023),
-    "Q2": y(2016,2023), "Q3": y(2011,2023), "Q4 e-tron": y(2021,2023),
-    "Q5": y(2008,2023), "Q7": y(2005,2023), "Q8": y(2018,2023),
-    "R8": y(2006,2023), "RS3": y(2011,2023), "RS4": y(2000,2023),
-    "RS6": y(2002,2023), "S3": y(1999,2023), "S4": y(1997,2023),
-    "TT": y(1998,2023), "e-tron": y(2019,2023)
-  },
-  "BMW": {
-    "Série 1": y(2004,2023), "Série 2": y(2014,2023), "Série 3": y(1982,2023),
-    "Série 4": y(2013,2023), "Série 5": y(1981,2023), "Série 6": y(2003,2023),
-    "Série 7": y(1977,2023), "Série 8": y(1989,2023), "M2": y(2016,2023),
-    "M3": y(1986,2023), "M4": y(2014,2023), "M5": y(1985,2023),
-    "X1": y(2009,2023), "X2": y(2018,2023), "X3": y(2003,2023),
-    "X4": y(2014,2023), "X5": y(1999,2023), "X6": y(2008,2023),
-    "X7": y(2019,2023), "Z3": y(1995,2002), "Z4": y(2002,2023), "i3": y(2013,2022), "i4": y(2021,2023)
-  },
-  "Chevrolet": {
-    "Aveo": y(2002,2015), "Captiva": y(2006,2018), "Corvette": y(1953,2023),
-    "Cruze": y(2008,2019), "Malibu": y(1964,2023), "Orlando": y(2010,2015),
-    "Spark": y(2009,2023), "Tahoe": y(1995,2023), "Trax": y(2013,2023)
-  },
-  "Citroën": {
-    "AX": y(1986,1998), "Berlingo": y(1996,2023), "C1": y(2005,2022),
-    "C2": y(2003,2010), "C3": y(2002,2023), "C3 Aircross": y(2017,2023),
-    "C4": y(2004,2023), "C4 Cactus": y(2014,2021), "C4 Picasso": y(2006,2018),
-    "C5": y(2001,2017), "C5 Aircross": y(2018,2023), "C5 X": y(2022,2023),
-    "C6": y(2005,2012), "C8": y(2002,2014), "DS3": y(2009,2019),
-    "DS4": y(2011,2015), "DS5": y(2011,2018), "Jumper": y(1994,2023),
-    "Jumpy": y(1994,2023), "Nemo": y(2007,2018), "Saxo": y(1996,2004),
-    "Spacetourer": y(2016,2023), "Xantia": y(1992,2003), "Xsara": y(1997,2006),
-    "ZX": y(1991,1998)
-  },
-  "Dacia": {
-    "Dokker": y(2012,2021), "Duster": y(2010,2023), "Jogger": y(2022,2023),
-    "Logan": y(2004,2023), "Lodgy": y(2012,2022), "Sandero": y(2008,2023),
-    "Spring": y(2021,2023)
-  },
-  "DS": {
-    "DS3": y(2016,2023), "DS4": y(2021,2023), "DS5": y(2015,2018),
-    "DS7 Crossback": y(2017,2023), "DS9": y(2021,2023)
-  },
-  "Fiat": {
-    "500": y(2007,2023), "500L": y(2012,2023), "500X": y(2014,2023),
-    "Bravo": y(2007,2014), "Doblo": y(2000,2023), "Ducato": y(1981,2023),
-    "Fiorino": y(2007,2023), "Idea": y(2003,2012), "Punto": y(1993,2018),
-    "Panda": y(1980,2023), "Qubo": y(2008,2021), "Scudo": y(1995,2023),
-    "Sedici": y(2006,2014), "Stilo": y(2001,2010), "Tipo": y(1988,2023),
-    "Ulysse": y(1994,2011)
-  },
-  "Ford": {
-    "B-Max": y(2012,2017), "C-Max": y(2003,2019), "EcoSport": y(2013,2022),
-    "Edge": y(2015,2023), "Explorer": y(1991,2023), "Fiesta": y(1976,2023),
-    "Focus": y(1998,2023), "Fusion": y(2002,2012), "Galaxy": y(1995,2023),
-    "Ka": y(1996,2016), "Ka+": y(2016,2021), "Kuga": y(2008,2023),
-    "Mondeo": y(1993,2022), "Mustang": y(1964,2023), "Puma": y(1997,2023),
-    "Ranger": y(1983,2023), "S-Max": y(2006,2023), "Transit": y(1965,2023),
-    "Transit Connect": y(2002,2023), "Transit Custom": y(2012,2023)
-  },
-  "Honda": {
-    "Accord": y(1976,2023), "Civic": y(1972,2023), "CR-V": y(1995,2023),
-    "CR-Z": y(2010,2016), "FR-V": y(2004,2009), "HR-V": y(1998,2023),
-    "Insight": y(1999,2014), "Jazz": y(2001,2023), "Legend": y(1985,2021),
-    "NSX": y(1990,2023), "Odyssey": y(1994,2021), "Pilot": y(2002,2023)
-  },
-  "Hyundai": {
-    "Bayon": y(2021,2023), "Coupé": y(1996,2009), "Elantra": y(1990,2023),
-    "Getz": y(2002,2010), "i10": y(2007,2023), "i20": y(2008,2023),
-    "i30": y(2007,2023), "i40": y(2011,2019), "Ioniq": y(2016,2023),
-    "Ioniq 5": y(2021,2023), "Kona": y(2017,2023), "Matrix": y(2001,2010),
-    "Santa Fe": y(2000,2023), "Sonata": y(1985,2023), "Tucson": y(2004,2023),
-    "Veloster": y(2011,2023)
-  },
-  "Jaguar": {
-    "E-Pace": y(2017,2023), "F-Pace": y(2016,2023), "F-Type": y(2013,2023),
-    "I-Pace": y(2018,2023), "S-Type": y(1999,2008), "X-Type": y(2001,2009),
-    "XE": y(2015,2023), "XF": y(2008,2023), "XJ": y(1968,2019)
-  },
-  "Jeep": {
-    "Cherokee": y(1984,2023), "Commander": y(2006,2023), "Compass": y(2006,2023),
-    "Grand Cherokee": y(1991,2023), "Renegade": y(2014,2023), "Wrangler": y(1986,2023)
-  },
-  "Kia": {
-    "Ceed": y(2006,2023), "EV6": y(2021,2023), "Niro": y(2016,2023),
-    "Picanto": y(2004,2023), "ProCeed": y(2018,2023), "Rio": y(2000,2023),
-    "Sorento": y(2002,2023), "Soul": y(2008,2023), "Sportage": y(1993,2023),
-    "Stinger": y(2017,2023), "XCeed": y(2019,2023)
-  },
-  "Land Rover": {
-    "Defender": y(1983,2023), "Discovery": y(1989,2023), "Discovery Sport": y(2014,2023),
-    "Freelander": y(1997,2015), "Range Rover": y(1970,2023),
-    "Range Rover Evoque": y(2011,2023), "Range Rover Sport": y(2005,2023),
-    "Range Rover Velar": y(2017,2023)
-  },
-  "Lexus": {
-    "CT": y(2010,2020), "ES": y(1989,2023), "GS": y(1991,2020),
-    "IS": y(1998,2023), "LC": y(2017,2023), "LS": y(1989,2023),
-    "NX": y(2014,2023), "RX": y(1997,2023), "UX": y(2018,2023)
-  },
-  "Mazda": {
-    "2": y(2003,2023), "3": y(2003,2023), "5": y(2005,2015),
-    "6": y(2002,2023), "CX-3": y(2015,2023), "CX-30": y(2019,2023),
-    "CX-5": y(2012,2023), "CX-60": y(2022,2023), "MX-5": y(1989,2023),
-    "RX-8": y(2003,2012)
-  },
-  "Mercedes": {
-    "Classe A": y(1997,2023), "Classe B": y(2005,2023), "Classe C": y(1993,2023),
-    "Classe CLA": y(2013,2023), "Classe CLS": y(2004,2023), "Classe E": y(1993,2023),
-    "Classe G": y(1979,2023), "Classe GL": y(2006,2023), "Classe GLA": y(2013,2023),
-    "Classe GLB": y(2019,2023), "Classe GLC": y(2015,2023), "Classe GLE": y(2015,2023),
-    "Classe GLK": y(2008,2015), "Classe GLS": y(2012,2023), "Classe M": y(1997,2015),
-    "Classe R": y(2005,2012), "Classe S": y(1991,2023), "Classe SL": y(1954,2023),
-    "Classe SLK": y(1996,2016), "Classe V": y(1996,2023), "Citan": y(2012,2023),
-    "EQA": y(2021,2023), "EQB": y(2021,2023), "EQC": y(2019,2023),
-    "EQE": y(2022,2023), "EQS": y(2021,2023), "Sprinter": y(1995,2023),
-    "Viano": y(2003,2014), "Vito": y(1996,2023)
-  },
-  "Mini": {
-    "Cabrio": y(2004,2023), "Clubman": y(2007,2023), "Countryman": y(2010,2023),
-    "Hatch": y(2001,2023), "Paceman": y(2012,2016), "Roadster": y(2012,2015)
-  },
-  "Mitsubishi": {
-    "ASX": y(2010,2023), "Colt": y(1978,2023), "Eclipse Cross": y(2017,2023),
-    "Galant": y(1969,2012), "L200": y(1978,2023), "Lancer": y(1973,2017),
-    "Outlander": y(2001,2023), "Pajero": y(1982,2021), "Space Star": y(1998,2023)
-  },
-  "Nissan": {
-    "350Z": y(2002,2009), "370Z": y(2009,2021), "Almera": y(1995,2018),
-    "Ariya": y(2022,2023), "Juke": y(2010,2023), "Leaf": y(2010,2023),
-    "Micra": y(1982,2022), "Murano": y(2002,2023), "Navara": y(1986,2023),
-    "Note": y(2005,2023), "Pathfinder": y(1985,2023), "Patrol": y(1980,2023),
-    "Pixo": y(2008,2013), "Pulsar": y(2014,2018), "Qashqai": y(2006,2023),
-    "X-Trail": y(2001,2023)
-  },
-  "Opel": {
-    "Adam": y(2012,2019), "Agila": y(2000,2014), "Ampera": y(2011,2015),
-    "Antara": y(2006,2015), "Astra": y(1991,2023), "Cascada": y(2013,2019),
-    "Combo": y(1986,2023), "Corsa": y(1982,2023), "Crossland": y(2017,2023),
-    "Frontera": y(1991,2004), "Grandland": y(2017,2023), "Insignia": y(2008,2023),
-    "Meriva": y(2003,2017), "Mokka": y(2012,2023), "Movano": y(1999,2023),
-    "Omega": y(1986,2003), "Signum": y(2003,2008), "Tigra": y(1994,2009),
-    "Vectra": y(1988,2009), "Vivaro": y(2001,2023), "Zafira": y(1999,2019)
+  "Alfa Romeo": { "145":y(1994,2001),"146":y(1994,2001),"147":y(2001,2010),"156":y(1997,2007),"159":y(2005,2012),"166":y(1998,2007),"Brera":y(2005,2010),"GTV":y(1994,2005),"Giulia":y(2016,2023),"Giulietta":y(2010,2020),"MiTo":y(2008,2018),"Spider":y(1994,2005),"Stelvio":y(2017,2023),"Tonale":y(2022,2023) },
+  "Audi": { "A1":y(2010,2023),"A2":y(1999,2005),"A3":y(1996,2023),"A4":y(1994,2023),"A5":y(2007,2023),"A6":y(1994,2023),"A7":y(2010,2023),"A8":y(1994,2023),"Q2":y(2016,2023),"Q3":y(2011,2023),"Q4 e-tron":y(2021,2023),"Q5":y(2008,2023),"Q7":y(2005,2023),"Q8":y(2018,2023),"R8":y(2006,2023),"RS3":y(2011,2023),"RS4":y(2000,2023),"RS6":y(2002,2023),"S3":y(1999,2023),"S4":y(1997,2023),"TT":y(1998,2023),"e-tron":y(2019,2023) },
+  "BMW": { "Série 1":y(2004,2023),"Série 2":y(2014,2023),"Série 3":y(1982,2023),"Série 4":y(2013,2023),"Série 5":y(1981,2023),"Série 6":y(2003,2023),"Série 7":y(1977,2023),"Série 8":y(1989,2023),"M2":y(2016,2023),"M3":y(1986,2023),"M4":y(2014,2023),"M5":y(1985,2023),"X1":y(2009,2023),"X2":y(2018,2023),"X3":y(2003,2023),"X4":y(2014,2023),"X5":y(1999,2023),"X6":y(2008,2023),"X7":y(2019,2023),"Z3":y(1995,2002),"Z4":y(2002,2023),"i3":y(2013,2022),"i4":y(2021,2023) },
+  "Chevrolet": { "Aveo":y(2002,2015),"Captiva":y(2006,2018),"Corvette":y(1953,2023),"Cruze":y(2008,2019),"Malibu":y(1964,2023),"Orlando":y(2010,2015),"Spark":y(2009,2023),"Tahoe":y(1995,2023),"Trax":y(2013,2023) },
+  "Citroën": { "AX":y(1986,1998),"Berlingo":y(1996,2023),"C1":y(2005,2022),"C2":y(2003,2010),"C3":y(2002,2023),"C3 Aircross":y(2017,2023),"C4":y(2004,2023),"C4 Cactus":y(2014,2021),"C4 Picasso":y(2006,2018),"C5":y(2001,2017),"C5 Aircross":y(2018,2023),"C5 X":y(2022,2023),"C6":y(2005,2012),"C8":y(2002,2014),"DS3":y(2009,2019),"DS4":y(2011,2015),"DS5":y(2011,2018),"Jumper":y(1994,2023),"Jumpy":y(1994,2023),"Nemo":y(2007,2018),"Saxo":y(1996,2004),"Spacetourer":y(2016,2023),"Xantia":y(1992,2003),"Xsara":y(1997,2006),"ZX":y(1991,1998) },
+  "Dacia": { "Dokker":y(2012,2021),"Duster":y(2010,2023),"Jogger":y(2022,2023),"Logan":y(2004,2023),"Lodgy":y(2012,2022),"Sandero":y(2008,2023),"Spring":y(2021,2023) },
+  "DS": { "DS3":y(2016,2023),"DS4":y(2021,2023),"DS5":y(2015,2018),"DS7 Crossback":y(2017,2023),"DS9":y(2021,2023) },
+  "Fiat": { "500":y(2007,2023),"500L":y(2012,2023),"500X":y(2014,2023),"Bravo":y(2007,2014),"Doblo":y(2000,2023),"Ducato":y(1981,2023),"Fiorino":y(2007,2023),"Idea":y(2003,2012),"Panda":y(1980,2023),"Punto":y(1993,2018),"Qubo":y(2008,2021),"Scudo":y(1995,2023),"Sedici":y(2006,2014),"Stilo":y(2001,2010),"Tipo":y(1988,2023),"Ulysse":y(1994,2011) },
+  "Ford": { "B-Max":y(2012,2017),"C-Max":y(2003,2019),"EcoSport":y(2013,2022),"Edge":y(2015,2023),"Fiesta":y(1976,2023),"Focus":y(1998,2023),"Fusion":y(2002,2012),"Galaxy":y(1995,2023),"Ka":y(1996,2016),"Ka+":y(2016,2021),"Kuga":y(2008,2023),"Mondeo":y(1993,2022),"Mustang":y(1964,2023),"Puma":y(1997,2023),"Ranger":y(1983,2023),"S-Max":y(2006,2023),"Transit":y(1965,2023),"Transit Connect":y(2002,2023),"Transit Custom":y(2012,2023) },
+  "Honda": { "Accord":y(1976,2023),"Civic":y(1972,2023),"CR-V":y(1995,2023),"CR-Z":y(2010,2016),"FR-V":y(2004,2009),"HR-V":y(1998,2023),"Insight":y(1999,2014),"Jazz":y(2001,2023),"Legend":y(1985,2021),"NSX":y(1990,2023) },
+  "Hyundai": { "Bayon":y(2021,2023),"Elantra":y(1990,2023),"Getz":y(2002,2010),"i10":y(2007,2023),"i20":y(2008,2023),"i30":y(2007,2023),"i40":y(2011,2019),"Ioniq":y(2016,2023),"Ioniq 5":y(2021,2023),"Kona":y(2017,2023),"Santa Fe":y(2000,2023),"Tucson":y(2004,2023) },
+  "Jaguar": { "E-Pace":y(2017,2023),"F-Pace":y(2016,2023),"F-Type":y(2013,2023),"I-Pace":y(2018,2023),"S-Type":y(1999,2008),"X-Type":y(2001,2009),"XE":y(2015,2023),"XF":y(2008,2023),"XJ":y(1968,2019) },
+  "Jeep": { "Cherokee":y(1984,2023),"Commander":y(2006,2023),"Compass":y(2006,2023),"Grand Cherokee":y(1991,2023),"Renegade":y(2014,2023),"Wrangler":y(1986,2023) },
+  "Kia": { "Ceed":y(2006,2023),"EV6":y(2021,2023),"Niro":y(2016,2023),"Picanto":y(2004,2023),"ProCeed":y(2018,2023),"Rio":y(2000,2023),"Sorento":y(2002,2023),"Soul":y(2008,2023),"Sportage":y(1993,2023),"Stinger":y(2017,2023),"XCeed":y(2019,2023) },
+  "Land Rover": { "Defender":y(1983,2023),"Discovery":y(1989,2023),"Discovery Sport":y(2014,2023),"Freelander":y(1997,2015),"Range Rover":y(1970,2023),"Range Rover Evoque":y(2011,2023),"Range Rover Sport":y(2005,2023),"Range Rover Velar":y(2017,2023) },
+  "Lexus": { "CT":y(2010,2020),"ES":y(1989,2023),"GS":y(1991,2020),"IS":y(1998,2023),"LC":y(2017,2023),"LS":y(1989,2023),"NX":y(2014,2023),"RX":y(1997,2023),"UX":y(2018,2023) },
+  "Mazda": { "2":y(2003,2023),"3":y(2003,2023),"5":y(2005,2015),"6":y(2002,2023),"CX-3":y(2015,2023),"CX-30":y(2019,2023),"CX-5":y(2012,2023),"CX-60":y(2022,2023),"MX-5":y(1989,2023),"RX-8":y(2003,2012) },
+  "Mercedes": { "Classe A":y(1997,2023),"Classe B":y(2005,2023),"Classe C":y(1993,2023),"Classe CLA":y(2013,2023),"Classe CLS":y(2004,2023),"Classe E":y(1993,2023),"Classe G":y(1979,2023),"Classe GL":y(2006,2023),"Classe GLA":y(2013,2023),"Classe GLB":y(2019,2023),"Classe GLC":y(2015,2023),"Classe GLE":y(2015,2023),"Classe GLS":y(2012,2023),"Classe S":y(1991,2023),"Classe SL":y(1954,2023),"Classe SLK":y(1996,2016),"Classe V":y(1996,2023),"Citan":y(2012,2023),"EQA":y(2021,2023),"EQB":y(2021,2023),"EQC":y(2019,2023),"EQE":y(2022,2023),"EQS":y(2021,2023),"Sprinter":y(1995,2023),"Viano":y(2003,2014),"Vito":y(1996,2023) },
+  "Mini": { "Cabrio":y(2004,2023),"Clubman":y(2007,2023),"Countryman":y(2010,2023),"Hatch":y(2001,2023),"Paceman":y(2012,2016),"Roadster":y(2012,2015) },
+  "Mitsubishi": { "ASX":y(2010,2023),"Colt":y(1978,2023),"Eclipse Cross":y(2017,2023),"L200":y(1978,2023),"Lancer":y(1973,2017),"Outlander":y(2001,2023),"Pajero":y(1982,2021),"Space Star":y(1998,2023) },
+  "Nissan": { "350Z":y(2002,2009),"370Z":y(2009,2021),"Almera":y(1995,2018),"Ariya":y(2022,2023),"Juke":y(2010,2023),"Leaf":y(2010,2023),"Micra":y(1982,2022),"Murano":y(2002,2023),"Navara":y(1986,2023),"Note":y(2005,2023),"Pathfinder":y(1985,2023),"Qashqai":y(2006,2023),"X-Trail":y(2001,2023) },
+  "Opel": { "Adam":y(2012,2019),"Agila":y(2000,2014),"Astra":y(1991,2023),"Cascada":y(2013,2019),"Combo":y(1986,2023),"Corsa":y(1982,2023),"Crossland":y(2017,2023),"Frontera":y(1991,2004),"Grandland":y(2017,2023),"Insignia":y(2008,2023),"Meriva":y(2003,2017),"Mokka":y(2012,2023),"Movano":y(1999,2023),"Omega":y(1986,2003),"Signum":y(2003,2008),"Tigra":y(1994,2009),"Vectra":y(1988,2009),"Vivaro":y(2001,2023),"Zafira":y(1999,2019) },
+  "Peugeot": { "106":y(1991,2003),"107":y(2005,2014),"108":y(2014,2021),"206":y(1998,2010),"207":y(2006,2014),"208":y(2012,2023),"301":y(2012,2021),"306":y(1993,2002),"307":y(2001,2009),"308":y(2007,2023),"405":y(1987,1997),"406":y(1995,2004),"407":y(2004,2011),"408":y(2022,2023),"508":y(2011,2023),"2008":y(2013,2023),"3008":y(2009,2023),"5008":y(2009,2023),"Bipper":y(2007,2018),"Boxer":y(1994,2023),"Expert":y(1995,2023),"Partner":y(1996,2023),"Rifter":y(2018,2023),"Traveller":y(2016,2023) },
+  "Porsche": { "718 Boxster":y(2016,2023),"718 Cayman":y(2016,2023),"911":y(1963,2023),"Cayenne":y(2002,2023),"Macan":y(2014,2023),"Panamera":y(2009,2023),"Taycan":y(2019,2023) },
+  "Renault": { "Arkana":y(2021,2023),"Austral":y(2022,2023),"Captur":y(2013,2023),"Clio":y(1990,2023),"Espace":y(1984,2023),"Express":y(2021,2023),"Fluence":y(2009,2017),"Grand Scénic":y(2004,2023),"Kadjar":y(2015,2022),"Kangoo":y(1997,2023),"Koleos":y(2008,2023),"Laguna":y(1993,2015),"Logan":y(2004,2023),"Master":y(1980,2023),"Mégane":y(1995,2023),"Modus":y(2004,2012),"Sandero":y(2007,2023),"Scénic":y(1996,2023),"Trafic":y(1980,2023),"Twingo":y(1992,2023),"Vel Satis":y(2001,2009),"Zoe":y(2012,2023) },
+  "Seat": { "Alhambra":y(1996,2022),"Altea":y(2004,2015),"Arona":y(2017,2023),"Ateca":y(2016,2023),"Cordoba":y(1993,2009),"Exeo":y(2008,2013),"Ibiza":y(1984,2023),"Leon":y(1999,2023),"Mii":y(2011,2020),"Tarraco":y(2018,2023),"Toledo":y(1991,2019) },
+  "Skoda": { "Citigo":y(2011,2021),"Enyaq":y(2020,2023),"Fabia":y(1999,2023),"Kamiq":y(2019,2023),"Karoq":y(2017,2023),"Kodiaq":y(2016,2023),"Octavia":y(1996,2023),"Rapid":y(2012,2019),"Roomster":y(2006,2015),"Scala":y(2019,2023),"Superb":y(2001,2023),"Yeti":y(2009,2017) },
+  "Smart": { "Fortwo":y(1998,2023),"Forfour":y(2004,2022),"Roadster":y(2003,2006) },
+  "Subaru": { "BRZ":y(2012,2023),"Forester":y(1997,2023),"Impreza":y(1992,2023),"Legacy":y(1989,2023),"Outback":y(1994,2023),"XV":y(2011,2023) },
+  "Suzuki": { "Alto":y(1979,2023),"Baleno":y(1995,2023),"Grand Vitara":y(1998,2015),"Ignis":y(2000,2023),"Jimny":y(1970,2023),"S-Cross":y(2013,2023),"Swift":y(1983,2023),"Vitara":y(1988,2023) },
+  "Tesla": { "Model 3":y(2017,2023),"Model S":y(2012,2023),"Model X":y(2015,2023),"Model Y":y(2020,2023) },
+  "Toyota": { "Auris":y(2006,2018),"Avensis":y(1997,2018),"Aygo":y(2005,2022),"Aygo X":y(2022,2023),"C-HR":y(2016,2023),"Camry":y(1982,2023),"Corolla":y(1966,2023),"GR Yaris":y(2020,2023),"HiAce":y(1967,2023),"HiLux":y(1968,2023),"Land Cruiser":y(1951,2023),"Prius":y(1997,2023),"ProAce":y(2013,2023),"RAV4":y(1994,2023),"Supra":y(1978,2023),"Verso":y(2009,2018),"Yaris":y(1999,2023),"Yaris Cross":y(2021,2023) },
+  "Volkswagen": { "Amarok":y(2010,2023),"Arteon":y(2017,2023),"Beetle":y(1938,2019),"Caddy":y(1980,2023),"California":y(1988,2023),"Caravelle":y(1950,2023),"CC":y(2008,2017),"Crafter":y(2006,2023),"Fox":y(2003,2011),"Golf":y(1974,2023),"Golf GTI":y(1976,2023),"Golf GTD":y(2003,2023),"Golf R":y(2002,2023),"Golf GTE":y(2014,2023),"Golf Plus":y(2004,2014),"Golf Variant":y(1993,2023),"Golf Cabriolet":y(1979,2016),"ID.3":y(2020,2023),"ID.4":y(2020,2023),"ID.5":y(2021,2023),"Jetta":y(1979,2023),"Lupo":y(1998,2005),"Passat":y(1973,2023),"Phaeton":y(2002,2016),"Polo":y(1975,2023),"Scirocco":y(1974,2017),"Sharan":y(1995,2022),"T-Cross":y(2018,2023),"T-Roc":y(2017,2023),"Taigo":y(2021,2023),"Tiguan":y(2007,2023),"Touareg":y(2002,2023),"Touran":y(2003,2023),"Transporter":y(1950,2023),"Up!":y(2011,2023) },
+  "Volvo": { "C30":y(2006,2013),"C40":y(2021,2023),"C70":y(1997,2013),"S40":y(1995,2012),"S60":y(2000,2023),"S80":y(1998,2016),"S90":y(1996,2023),"V40":y(1995,2019),"V50":y(2004,2012),"V60":y(2010,2023),"V70":y(1996,2016),"V90":y(1996,2023),"XC40":y(2017,2023),"XC60":y(2008,2023),"XC70":y(2000,2016),"XC90":y(2002,2023) }
+};
+
+const MOTORISATIONS = {
+  "Renault": {
+    "Clio": ["1.0 SCe 65ch","1.0 TCe 90ch","1.0 TCe 100ch","1.2 16V 75ch","1.2 TCe 120ch","1.4 16V 98ch","1.5 dCi 65ch","1.5 dCi 75ch","1.5 dCi 85ch","1.5 dCi 90ch","1.5 dCi 110ch","1.6 E-Tech 140ch","E-Tech Electric 120ch"],
+    "Mégane": ["1.2 TCe 115ch","1.2 TCe 130ch","1.3 TCe 115ch","1.3 TCe 140ch","1.5 dCi 90ch","1.5 dCi 110ch","1.6 dCi 130ch","1.6 E-Tech 160ch","1.8 TCe RS 280ch","2.0 TCe RS 265ch","2.0 TCe RS Trophy 300ch"],
+    "Captur": ["1.0 TCe 90ch","1.0 TCe 100ch","1.2 TCe 120ch","1.3 TCe 130ch","1.3 TCe 140ch","1.5 dCi 90ch","1.5 dCi 110ch","1.6 E-Tech 145ch","1.6 E-Tech 160ch"],
+    "Kadjar": ["1.2 TCe 130ch","1.3 TCe 140ch","1.5 dCi 110ch","1.5 dCi 115ch","1.6 dCi 130ch","2.0 dCi 165ch"],
+    "Kangoo": ["1.0 TCe 100ch","1.2 TCe 115ch","1.5 dCi 75ch","1.5 dCi 90ch","1.5 dCi 110ch","1.6 16V 98ch","E-Tech Electric 90ch"],
+    "Master": ["2.3 dCi 100ch","2.3 dCi 125ch","2.3 dCi 135ch","2.3 dCi 145ch","2.3 dCi 150ch","2.3 dCi 170ch","2.3 dCi 180ch"],
+    "Trafic": ["1.6 dCi 95ch","1.6 dCi 120ch","1.6 dCi 125ch","2.0 dCi 90ch","2.0 dCi 120ch","2.0 dCi 145ch","2.0 dCi 170ch"],
+    "Twingo": ["0.9 TCe 70ch","0.9 TCe 90ch","0.9 TCe 95ch","1.0 SCe 65ch","1.2 16V 75ch","E-Tech Electric 82ch"],
+    "Zoe": ["R75 65ch","R90 88ch","R110 108ch","R135 135ch","Z.E. 40 88ch","Z.E. 50 108ch"],
+    "Arkana": ["1.3 TCe 140ch","1.3 TCe 160ch","E-Tech 145ch","E-Tech 160ch"],
+    "Austral": ["1.2 TCe 130ch","1.2 TCe 160ch","1.2 TCe 200ch","E-Tech 200ch","E-Tech 220ch"],
+    "Scénic": ["1.2 TCe 115ch","1.2 TCe 130ch","1.3 TCe 140ch","1.5 dCi 110ch","1.6 dCi 130ch","E-Tech 135ch","E-Tech 170ch"],
+    "Grand Scénic": ["1.2 TCe 115ch","1.3 TCe 140ch","1.5 dCi 110ch","1.6 dCi 130ch","E-Tech 135ch"],
+    "Laguna": ["1.6 16V 110ch","1.6 TCe 150ch","2.0 16V 140ch","2.0 Turbo 170ch","1.5 dCi 90ch","1.5 dCi 110ch","2.0 dCi 130ch","2.0 dCi 150ch","3.5 V6 240ch"],
+    "Logan": ["0.9 TCe 90ch","1.0 SCe 65ch","1.0 TCe 100ch","1.2 16V 75ch","1.5 dCi 75ch","1.5 dCi 90ch"]
   },
   "Peugeot": {
-    "106": y(1991,2003), "107": y(2005,2014), "108": y(2014,2021),
-    "206": y(1998,2010), "207": y(2006,2014), "208": y(2012,2023),
-    "301": y(2012,2021), "306": y(1993,2002), "307": y(2001,2009),
-    "308": y(2007,2023), "405": y(1987,1997), "406": y(1995,2004),
-    "407": y(2004,2011), "408": y(2022,2023), "508": y(2011,2023),
-    "605": y(1989,1999), "607": y(2000,2010), "806": y(1994,2002),
-    "807": y(2002,2014), "1007": y(2004,2009), "2008": y(2013,2023),
-    "3008": y(2009,2023), "4007": y(2007,2013), "4008": y(2012,2017),
-    "5008": y(2009,2023), "Bipper": y(2007,2018), "Boxer": y(1994,2023),
-    "Expert": y(1995,2023), "Partner": y(1996,2023), "Rifter": y(2018,2023),
-    "Traveller": y(2016,2023)
+    "208": ["1.0 VTi 68ch","1.2 PureTech 75ch","1.2 PureTech 82ch","1.2 PureTech 100ch","1.2 PureTech 110ch","1.2 PureTech 130ch","1.4 HDi 68ch","1.6 BlueHDi 75ch","1.6 BlueHDi 100ch","1.6 BlueHDi 120ch","GTi 1.6 THP 200ch","GTi 1.6 THP 208ch","e-208 Electric 136ch"],
+    "308": ["1.0 PureTech 75ch","1.2 PureTech 110ch","1.2 PureTech 130ch","1.5 BlueHDi 100ch","1.5 BlueHDi 130ch","1.6 BlueHDi 120ch","1.6 THP GT 205ch","1.6 THP GTi 270ch","1.6 E-Tech 180ch","1.6 E-Tech 225ch"],
+    "2008": ["1.0 PureTech 75ch","1.2 PureTech 100ch","1.2 PureTech 110ch","1.2 PureTech 130ch","1.5 BlueHDi 100ch","1.5 BlueHDi 110ch","1.6 BlueHDi 120ch","e-2008 Electric 136ch","e-2008 Electric 156ch"],
+    "3008": ["1.2 PureTech 130ch","1.5 BlueHDi 100ch","1.5 BlueHDi 130ch","1.6 BlueHDi 120ch","2.0 BlueHDi 150ch","2.0 BlueHDi 180ch","1.6 THP 165ch","1.6 E-Tech 180ch","1.6 E-Tech 225ch"],
+    "5008": ["1.2 PureTech 130ch","1.5 BlueHDi 100ch","1.5 BlueHDi 130ch","1.6 BlueHDi 120ch","2.0 BlueHDi 150ch","2.0 BlueHDi 180ch","1.6 E-Tech 180ch"],
+    "508": ["1.5 BlueHDi 130ch","1.6 PureTech 180ch","1.6 PureTech 225ch","2.0 BlueHDi 160ch","2.0 BlueHDi 180ch","1.6 E-Tech 225ch","1.6 E-Tech 360ch"],
+    "Partner": ["1.0 PureTech 75ch","1.2 PureTech 110ch","1.5 BlueHDi 75ch","1.5 BlueHDi 100ch","1.6 BlueHDi 120ch","Electric 136ch"],
+    "Expert": ["1.5 BlueHDi 100ch","1.5 BlueHDi 120ch","2.0 BlueHDi 120ch","2.0 BlueHDi 145ch","2.0 BlueHDi 180ch","Electric 136ch"],
+    "Boxer": ["2.0 BlueHDi 110ch","2.0 BlueHDi 130ch","2.2 BlueHDi 120ch","2.2 BlueHDi 140ch","2.2 BlueHDi 165ch","3.0 HDi 160ch"],
+    "207": ["1.4 VTi 95ch","1.6 THP 150ch","1.6 THP 175ch","1.4 HDi 70ch","1.6 HDi 90ch","1.6 HDi 110ch"],
+    "407": ["1.6 HDi 110ch","2.0 HDi 136ch","2.0 HDi 163ch","2.7 V6 HDi 204ch","2.0 16V 140ch","3.0 V6 211ch"],
+    "Rifter": ["1.2 PureTech 110ch","1.5 BlueHDi 100ch","1.5 BlueHDi 130ch","Electric 136ch"]
   },
-  "Porsche": {
-    "718 Boxster": y(2016,2023), "718 Cayman": y(2016,2023), "911": y(1963,2023),
-    "Cayenne": y(2002,2023), "Macan": y(2014,2023), "Panamera": y(2009,2023),
-    "Taycan": y(2019,2023)
-  },
-  "Renault": {
-    "Arkana": y(2021,2023), "Austral": y(2022,2023), "Captur": y(2013,2023),
-    "Clio": y(1990,2023), "Espace": y(1984,2023), "Express": y(2021,2023),
-    "Fluence": y(2009,2017), "Grand Scénic": y(2004,2023), "Kadjar": y(2015,2022),
-    "Kangoo": y(1997,2023), "Koleos": y(2008,2023), "Laguna": y(1993,2015),
-    "Latitude": y(2010,2015), "Logan": y(2004,2023), "Master": y(1980,2023),
-    "Mégane": y(1995,2023), "Modus": y(2004,2012), "Safrane": y(1992,2000),
-    "Sandero": y(2007,2023), "Scénic": y(1996,2023), "Symbol": y(1998,2023),
-    "Trafic": y(1980,2023), "Twingo": y(1992,2023), "Vel Satis": y(2001,2009),
-    "Wind": y(2010,2013), "Zoe": y(2012,2023)
-  },
-  "Seat": {
-    "Alhambra": y(1996,2022), "Altea": y(2004,2015), "Arona": y(2017,2023),
-    "Ateca": y(2016,2023), "Cordoba": y(1993,2009), "Exeo": y(2008,2013),
-    "Ibiza": y(1984,2023), "Leon": y(1999,2023), "Mii": y(2011,2020),
-    "Tarraco": y(2018,2023), "Toledo": y(1991,2019)
-  },
-  "Skoda": {
-    "Citigo": y(2011,2021), "Enyaq": y(2020,2023), "Fabia": y(1999,2023),
-    "Kamiq": y(2019,2023), "Karoq": y(2017,2023), "Kodiaq": y(2016,2023),
-    "Octavia": y(1996,2023), "Rapid": y(2012,2019), "Roomster": y(2006,2015),
-    "Scala": y(2019,2023), "Superb": y(2001,2023), "Yeti": y(2009,2017)
-  },
-  "Smart": {
-    "Fortwo": y(1998,2023), "Forfour": y(2004,2022), "Roadster": y(2003,2006)
-  },
-  "Subaru": {
-    "BRZ": y(2012,2023), "Forester": y(1997,2023), "Impreza": y(1992,2023),
-    "Legacy": y(1989,2023), "Outback": y(1994,2023), "XV": y(2011,2023)
-  },
-  "Suzuki": {
-    "Alto": y(1979,2023), "Baleno": y(1995,2023), "Grand Vitara": y(1998,2015),
-    "Ignis": y(2000,2023), "Jimny": y(1970,2023), "Liana": y(2001,2007),
-    "S-Cross": y(2013,2023), "Splash": y(2008,2015), "Swift": y(1983,2023),
-    "SX4": y(2006,2013), "Vitara": y(1988,2023), "Wagon R": y(1997,2023)
-  },
-  "Tesla": {
-    "Model 3": y(2017,2023), "Model S": y(2012,2023),
-    "Model X": y(2015,2023), "Model Y": y(2020,2023)
-  },
-  "Toyota": {
-    "Auris": y(2006,2018), "Avensis": y(1997,2018), "Aygo": y(2005,2022),
-    "Aygo X": y(2022,2023), "C-HR": y(2016,2023), "Camry": y(1982,2023),
-    "Corolla": y(1966,2023), "GR Yaris": y(2020,2023), "HiAce": y(1967,2023),
-    "HiLux": y(1968,2023), "Land Cruiser": y(1951,2023), "Prius": y(1997,2023),
-    "ProAce": y(2013,2023), "RAV4": y(1994,2023), "Supra": y(1978,2023),
-    "Urban Cruiser": y(2009,2014), "Verso": y(2009,2018), "Yaris": y(1999,2023),
-    "Yaris Cross": y(2021,2023)
+  "Citroën": {
+    "C3": ["1.0 PureTech 68ch","1.0 PureTech 75ch","1.2 PureTech 82ch","1.2 PureTech 83ch","1.2 PureTech 100ch","1.2 PureTech 110ch","1.4 HDi 70ch","1.6 BlueHDi 75ch","1.6 BlueHDi 100ch"],
+    "C4": ["1.0 PureTech 100ch","1.2 PureTech 130ch","1.5 BlueHDi 110ch","1.5 BlueHDi 130ch","e-C4 Electric 136ch"],
+    "C5 Aircross": ["1.2 PureTech 130ch","1.5 BlueHDi 130ch","2.0 BlueHDi 150ch","1.6 E-Tech 225ch"],
+    "Berlingo": ["1.0 PureTech 75ch","1.2 PureTech 110ch","1.5 BlueHDi 75ch","1.5 BlueHDi 100ch","1.5 BlueHDi 130ch","Electric 136ch"],
+    "Jumpy": ["1.5 BlueHDi 100ch","1.5 BlueHDi 120ch","2.0 BlueHDi 120ch","2.0 BlueHDi 145ch","2.0 BlueHDi 180ch","Electric 136ch"],
+    "Jumper": ["2.0 BlueHDi 110ch","2.0 BlueHDi 130ch","2.2 BlueHDi 120ch","2.2 BlueHDi 140ch","2.2 BlueHDi 165ch"],
+    "C3 Aircross": ["1.0 PureTech 100ch","1.2 PureTech 110ch","1.2 PureTech 130ch","1.5 BlueHDi 100ch","1.5 BlueHDi 120ch"],
+    "Xsara": ["1.4 i 75ch","1.6 i 110ch","1.8 i 115ch","2.0 i 136ch","1.4 HDi 70ch","1.6 HDi 90ch","1.9 D 70ch","2.0 HDi 90ch","2.0 HDi 110ch"],
+    "C5": ["1.6 THP 155ch","2.0 16V 143ch","2.0 HPi 140ch","2.0 THP 165ch","3.0 V6 215ch","1.6 HDi 110ch","2.0 HDi 140ch","2.0 HDi 160ch","2.2 HDi 200ch"]
   },
   "Volkswagen": {
-    "Amarok": y(2010,2023), "Arteon": y(2017,2023), "Beetle": y(1938,2019),
-    "Caddy": y(1980,2023), "California": y(1988,2023), "Caravelle": y(1950,2023),
-    "CC": y(2008,2017), "Crafter": y(2006,2023), "Fox": y(2003,2011),
-    "Golf": y(1974,2023), "Golf GTI": y(1976,2023), "Golf GTD": y(2003,2023),
-    "Golf R": y(2002,2023), "Golf GTE": y(2014,2023), "Golf Plus": y(2004,2014),
-    "Golf Variant": y(1993,2023), "Golf Cabriolet": y(1979,2016),
-    "ID.3": y(2020,2023), "ID.4": y(2020,2023),
-    "ID.5": y(2021,2023), "Jetta": y(1979,2023), "Lupo": y(1998,2005),
-    "Passat": y(1973,2023), "Phaeton": y(2002,2016), "Polo": y(1975,2023),
-    "Scirocco": y(1974,2017), "Sharan": y(1995,2022), "T-Cross": y(2018,2023),
-    "T-Roc": y(2017,2023), "Taigo": y(2021,2023), "Tiguan": y(2007,2023),
-    "Touareg": y(2002,2023), "Touran": y(2003,2023), "Transporter": y(1950,2023),
-    "Up!": y(2011,2023)
+    "Golf": ["1.0 TSI 90ch","1.0 TSI 110ch","1.2 TSI 85ch","1.2 TSI 105ch","1.4 TSI 122ch","1.4 TSI 140ch","1.5 TSI 130ch","1.5 TSI 150ch","1.5 eTSI 150ch","1.6 TDI 90ch","1.6 TDI 105ch","2.0 TDI 115ch","2.0 TDI 140ch","2.0 TDI 150ch","2.0 TSI GTI 230ch","2.0 TSI GTI 245ch","2.0 TDI GTD 200ch","2.0 TSI R 300ch","2.0 TSI R 320ch","1.4 GTE 204ch","e-Golf 136ch"],
+    "Golf GTI": ["2.0 TSI 200ch","2.0 TSI 210ch","2.0 TSI 220ch","2.0 TSI 230ch","2.0 TSI 245ch","2.0 TSI Clubsport 265ch","2.0 TSI Clubsport S 310ch"],
+    "Golf GTD": ["2.0 TDI 170ch","2.0 TDI 184ch","2.0 TDI 200ch"],
+    "Golf R": ["2.0 TSI 250ch","2.0 TSI 265ch","2.0 TSI 300ch","2.0 TSI 320ch"],
+    "Golf GTE": ["1.4 GTE 204ch","1.4 GTE 245ch"],
+    "Polo": ["1.0 MPI 65ch","1.0 MPI 75ch","1.0 TSI 95ch","1.0 TSI 110ch","1.2 TSI 70ch","1.2 TSI 90ch","1.6 TDI 80ch","1.6 TDI 95ch","2.0 TSI GTI 200ch","2.0 TSI GTI 207ch"],
+    "Tiguan": ["1.4 TSI 125ch","1.5 TSI 130ch","1.5 TSI 150ch","2.0 TSI 180ch","2.0 TSI 220ch","2.0 TDI 115ch","2.0 TDI 150ch","2.0 TDI 190ch","1.4 GTE 218ch","2.0 TSI R 4Motion 300ch"],
+    "T-Roc": ["1.0 TSI 115ch","1.5 TSI 150ch","2.0 TSI 190ch","2.0 TSI R 300ch","1.6 TDI 95ch","2.0 TDI 115ch","2.0 TDI 150ch"],
+    "Passat": ["1.4 TSI 125ch","1.5 TSI 150ch","2.0 TSI 220ch","2.0 TDI 122ch","2.0 TDI 150ch","2.0 TDI 190ch","1.4 GTE 218ch","2.0 TDI 4Motion 190ch"],
+    "Transporter": ["2.0 TDI 84ch","2.0 TDI 102ch","2.0 TDI 110ch","2.0 TDI 114ch","2.0 TDI 150ch","2.0 TDI 204ch","2.0 BiTDI 204ch"],
+    "Caddy": ["1.0 TSI 102ch","2.0 TDI 55ch","2.0 TDI 75ch","2.0 TDI 102ch","2.0 TDI 122ch","e-Caddy Electric"],
+    "Crafter": ["2.0 TDI 102ch","2.0 TDI 140ch","2.0 TDI 163ch","2.0 TDI 177ch"],
+    "Amarok": ["2.0 TDI 122ch","2.0 TDI 140ch","2.0 TDI 163ch","2.0 BiTDI 180ch","2.0 BiTDI 204ch","3.0 TDI 224ch","3.0 V6 TDI 258ch"],
+    "Touran": ["1.0 TSI 115ch","1.5 TSI 150ch","2.0 TDI 115ch","2.0 TDI 150ch","1.4 TSI 140ch"],
+    "Touareg": ["2.0 TSI 245ch","3.0 TSI 340ch","3.0 TSI eHybrid 462ch","3.0 TDI 231ch","3.0 TDI 286ch","4.0 TDI V8 422ch"]
+  },
+  "Audi": {
+    "A1": ["1.0 TFSI 82ch","1.0 TFSI 95ch","1.0 TFSI 116ch","1.4 TFSI 125ch","1.5 TFSI 150ch","1.8 TFSI 192ch","S1 2.0 TFSI 231ch","1.6 TDI 116ch","30 TFSI 116ch","35 TFSI 150ch"],
+    "A3": ["1.0 TFSI 116ch","1.4 TFSI 125ch","1.5 TFSI 150ch","2.0 TFSI 190ch","2.0 TFSI 230ch","S3 2.0 TFSI 300ch","S3 2.0 TFSI 310ch","1.6 TDI 110ch","2.0 TDI 116ch","2.0 TDI 150ch","30 TFSI 116ch","35 TFSI 150ch","40 TFSI 204ch","45 TFSI 245ch","30 TDI 116ch","35 TDI 150ch","1.4 e-tron 204ch"],
+    "A4": ["1.4 TFSI 150ch","2.0 TFSI 150ch","2.0 TFSI 190ch","2.0 TFSI 252ch","3.0 TFSI 340ch","S4 3.0 TFSI 354ch","RS4 2.9 TFSI 450ch","2.0 TDI 122ch","2.0 TDI 150ch","2.0 TDI 190ch","3.0 TDI 218ch","3.0 TDI 272ch"],
+    "A5": ["1.8 TFSI 170ch","2.0 TFSI 190ch","2.0 TFSI 252ch","3.0 TFSI 272ch","S5 3.0 TFSI 354ch","RS5 2.9 TFSI 450ch","2.0 TDI 150ch","2.0 TDI 190ch","3.0 TDI 218ch","3.0 TDI 272ch"],
+    "A6": ["2.0 TFSI 190ch","2.0 TFSI 252ch","3.0 TFSI 340ch","S6 2.9 TFSI 450ch","RS6 4.0 TFSI 600ch","2.0 TDI 190ch","3.0 TDI 218ch","3.0 TDI 272ch","50 TDI 286ch","55 TFSI e 367ch"],
+    "Q3": ["1.4 TFSI 125ch","1.5 TFSI 150ch","2.0 TFSI 180ch","2.0 TFSI 220ch","2.0 TDI 120ch","2.0 TDI 150ch","RS Q3 2.5 TFSI 340ch","35 TFSI 150ch","35 TDI 150ch","40 TFSI 190ch"],
+    "Q5": ["2.0 TFSI 180ch","2.0 TFSI 252ch","3.0 TFSI 354ch","SQ5 3.0 TFSI 354ch","2.0 TDI 163ch","2.0 TDI 190ch","3.0 TDI 218ch","3.0 TDI 286ch","50 TFSI e 299ch","50 TFSI e 367ch"],
+    "Q7": ["2.0 TFSI 252ch","3.0 TFSI 380ch","SQ7 4.0 TDI 435ch","3.0 TDI 218ch","3.0 TDI 272ch","45 TFSI 245ch","55 TFSI 340ch","60 TFSI e 462ch"],
+    "TT": ["1.8 TFSI 160ch","1.8 TFSI 180ch","2.0 TFSI 200ch","2.0 TFSI 230ch","TTS 2.0 TFSI 272ch","TTRS 2.5 TFSI 400ch"]
+  },
+  "BMW": {
+    "Série 1": ["116i 102ch","116i 109ch","118i 136ch","118i 140ch","120i 150ch","120i 156ch","M135i 306ch","M140i 340ch","116d 95ch","116d 116ch","118d 143ch","118d 150ch","120d 184ch","120d 190ch","M135i xDrive 306ch"],
+    "Série 2": ["218i 136ch","220i 192ch","225i 231ch","M240i 340ch","216d 116ch","218d 150ch","220d 190ch","225e 220ch","220e 245ch"],
+    "Série 3": ["318i 136ch","318i 150ch","320i 150ch","320i 184ch","330i 258ch","330e 292ch","M340i 374ch","M3 431ch","M3 Competition 510ch","316d 85ch","316d 116ch","318d 143ch","318d 150ch","320d 163ch","320d 190ch","330d 265ch"],
+    "Série 5": ["518d 150ch","520i 170ch","520i 184ch","530i 252ch","540i 340ch","M550i 530ch","M5 600ch","M5 Competition 625ch","520d 163ch","520d 190ch","525d 218ch","530d 265ch","540d 313ch","530e 252ch"],
+    "X1": ["sDrive18i 136ch","xDrive20i 192ch","xDrive25i 231ch","sDrive18d 150ch","xDrive20d 190ch","xDrive25d 231ch","xDrive25e 220ch","iX1 313ch"],
+    "X3": ["sDrive20i 184ch","xDrive20i 184ch","xDrive30i 252ch","M40i 360ch","X3 M 480ch","X3 M Competition 510ch","sDrive18d 150ch","xDrive20d 190ch","xDrive30d 265ch","M40d 326ch","xDrive30e 292ch","iX3 286ch"],
+    "X5": ["xDrive40i 340ch","xDrive50i 462ch","M50i 530ch","X5 M 575ch","X5 M Competition 625ch","xDrive30d 265ch","xDrive40d 340ch","xDrive45e 394ch","xDrive50e 489ch"],
+    "Série 4": ["420i 184ch","430i 258ch","440i 374ch","M440i 374ch","M4 480ch","M4 Competition 510ch","418d 150ch","420d 190ch","430d 286ch","M4 CS 550ch"]
+  },
+  "Mercedes": {
+    "Classe A": ["A160 102ch","A180 136ch","A200 163ch","A220 190ch","A250 224ch","A35 AMG 306ch","A45 AMG 360ch","A45 S AMG 421ch","A160d 90ch","A180d 116ch","A200d 150ch","A220d 190ch"],
+    "Classe B": ["B160 102ch","B180 136ch","B200 163ch","B180d 116ch","B200d 150ch","B220d 190ch","B250e 218ch"],
+    "Classe C": ["C160 129ch","C180 156ch","C200 184ch","C300 258ch","C43 AMG 390ch","C63 AMG 476ch","C63 S AMG 510ch","C63 S E Performance 680ch","C180d 122ch","C200d 160ch","C220d 200ch","C300d 265ch","C300e 320ch"],
+    "Classe E": ["E200 184ch","E300 258ch","E400 333ch","E43 AMG 401ch","E53 AMG 435ch","E63 AMG 571ch","E180d 120ch","E200d 160ch","E220d 194ch","E300d 265ch","E400d 340ch","E300e 320ch","E350e 292ch"],
+    "Classe GLC": ["GLC200 197ch","GLC300 258ch","GLC43 AMG 390ch","GLC63 AMG 476ch","GLC200d 163ch","GLC220d 194ch","GLC300d 245ch","GLC300e 313ch","GLC300de 313ch"],
+    "Vito": ["109 CDI 88ch","111 CDI 116ch","114 CDI 136ch","116 CDI 163ch","119 CDI 190ch","e-Vito Electric"],
+    "Sprinter": ["211 CDI 114ch","213 CDI 130ch","214 CDI 143ch","216 CDI 163ch","219 CDI 190ch","311 CDI 114ch","314 CDI 143ch","316 CDI 163ch","eSprinter Electric"],
+    "Classe GLA": ["GLA200 163ch","GLA250 224ch","GLA35 AMG 306ch","GLA45 AMG 360ch","GLA200d 150ch","GLA220d 190ch","GLA250e 218ch"],
+    "Classe GLB": ["GLB200 163ch","GLB250 224ch","GLB35 AMG 306ch","GLB200d 150ch","GLB220d 190ch","GLB250e 218ch"],
+    "Classe V": ["V220d 163ch","V250d 190ch","V300d 239ch","Marco Polo 220d","EQV 300 204ch"]
+  },
+  "Ford": {
+    "Fiesta": ["1.0 EcoBoost 65ch","1.0 EcoBoost 85ch","1.0 EcoBoost 95ch","1.0 EcoBoost 100ch","1.0 EcoBoost 125ch","1.1 Ti-VCT 70ch","1.1 Ti-VCT 85ch","ST 1.5 EcoBoost 200ch","ST 1.5 EcoBoost 212ch","1.5 TDCi 75ch","1.5 TDCi 85ch","1.5 TDCi 95ch","1.5 TDCi 120ch"],
+    "Focus": ["1.0 EcoBoost 85ch","1.0 EcoBoost 100ch","1.0 EcoBoost 125ch","1.5 EcoBoost 150ch","1.5 EcoBoost 182ch","ST 2.3 EcoBoost 280ch","RS 2.3 EcoBoost 350ch","1.5 EcoBlue 95ch","1.5 EcoBlue 120ch","2.0 EcoBlue 150ch","2.0 EcoBlue 190ch"],
+    "Kuga": ["1.5 EcoBoost 120ch","1.5 EcoBoost 150ch","2.0 EcoBoost 242ch","ST-Line X PHEV 225ch","1.5 EcoBlue 120ch","2.0 EcoBlue 150ch","2.0 EcoBlue 190ch","PHEV 225ch"],
+    "Transit": ["2.0 EcoBlue 105ch","2.0 EcoBlue 130ch","2.0 EcoBlue 170ch","2.0 EcoBlue 185ch","E-Transit Electric 184ch"],
+    "Transit Custom": ["2.0 EcoBlue 105ch","2.0 EcoBlue 130ch","2.0 EcoBlue 136ch","PHEV 126ch","E-Transit Custom 136ch"],
+    "Mondeo": ["1.0 EcoBoost 125ch","1.5 EcoBoost 160ch","2.0 EcoBoost 240ch","2.0 TDCi 150ch","2.0 TDCi 180ch","2.0 HEV 187ch"],
+    "Puma": ["1.0 EcoBoost 95ch","1.0 EcoBoost 125ch","1.0 EcoBoost mHEV 125ch","1.0 EcoBoost mHEV 155ch","ST 1.5 EcoBoost 200ch","1.5 EcoBlue 120ch"],
+    "C-Max": ["1.0 EcoBoost 100ch","1.0 EcoBoost 125ch","1.5 TDCi 95ch","1.5 TDCi 120ch","2.0 TDCi 150ch","1.0 EcoBoost mHEV 125ch"]
+  },
+  "Opel": {
+    "Corsa": ["1.0 Turbo 90ch","1.2 Turbo 100ch","1.2 Turbo 130ch","1.4 Turbo 100ch","1.4 Turbo 120ch","OPC 1.6 Turbo 207ch","e-Corsa Electric 136ch","1.3 CDTI 75ch","1.3 CDTI 95ch","1.5 CDTI 85ch","1.5 CDTI 102ch"],
+    "Astra": ["1.0 Turbo 105ch","1.2 Turbo 110ch","1.2 Turbo 130ch","1.4 Turbo 125ch","1.4 Turbo 150ch","1.6 Turbo GSi 200ch","Plug-in Hybrid 180ch","Plug-in Hybrid 225ch","1.5 CDTI 105ch","1.5 CDTI 122ch","2.0 CDTI 110ch","2.0 CDTI 165ch"],
+    "Mokka": ["1.0 Turbo 105ch","1.2 Turbo 100ch","1.2 Turbo 130ch","1.4 Turbo 120ch","e-Mokka Electric 136ch","e-Mokka-e 50kWh","1.6 CDTI 110ch","1.6 CDTI 136ch"],
+    "Grandland": ["1.2 Turbo 130ch","1.6 Turbo 180ch","1.6 PHEV 225ch","1.6 PHEV 4x4 300ch","1.5 CDTI 130ch","2.0 CDTI 130ch","2.0 CDTI 177ch"],
+    "Crossland": ["1.0 Turbo 83ch","1.2 Turbo 110ch","1.2 Turbo 130ch","1.5 CDTI 102ch","1.5 CDTI 110ch","e-Crossland Electric"],
+    "Vivaro": ["1.5 CDTI 100ch","1.5 CDTI 120ch","2.0 CDTI 120ch","2.0 CDTI 145ch","2.0 CDTI 180ch","e-Vivaro Electric 136ch"],
+    "Insignia": ["1.5 Turbo 140ch","1.6 Turbo 170ch","2.0 Turbo 260ch","OPC 2.8 V6 325ch","1.6 CDTI 110ch","1.6 CDTI 136ch","2.0 CDTI 110ch","2.0 CDTI 170ch"]
+  },
+  "Toyota": {
+    "Yaris": ["1.0 VVT-i 69ch","1.0 VVT-i 72ch","1.5 VVT-i 111ch","1.5 Hybrid 100ch","1.5 Hybrid 116ch","GR Yaris 261ch","1.4 D-4D 90ch"],
+    "Yaris Cross": ["1.5 Hybrid 116ch","1.5 Hybrid AWD 130ch","GR Sport 1.5 Hybrid 130ch"],
+    "Corolla": ["1.2 Turbo 114ch","1.8 Hybrid 122ch","2.0 Hybrid 180ch","GR Sport 2.0 Hybrid 196ch","GR Corolla 304ch","2.0 D-4D 116ch","2.0 D-4D 150ch"],
+    "RAV4": ["2.0 VVT-iE 175ch","2.5 Hybrid 218ch","2.5 Hybrid AWD 222ch","2.5 Plug-in Hybrid 306ch","2.0 D-4D 150ch","2.2 D-4D 150ch","2.2 D-4D 177ch"],
+    "C-HR": ["1.2 Turbo 116ch","1.8 Hybrid 122ch","2.0 Hybrid 184ch","Plug-in Hybrid 223ch","GR Sport 2.0 Hybrid 197ch"],
+    "ProAce": ["1.5 D-4D 100ch","1.5 D-4D 120ch","2.0 D-4D 120ch","2.0 D-4D 150ch","2.0 D-4D 180ch","Electric 50kWh 136ch","Electric 75kWh 136ch"],
+    "HiLux": ["2.4 D-4D 150ch","2.8 D-4D 204ch","2.8 D-4D 224ch"],
+    "Prius": ["1.8 Hybrid 122ch","2.0 PHEV 223ch","2.0 Hybrid 196ch"]
+  },
+  "Dacia": {
+    "Sandero": ["1.0 SCe 65ch","1.0 TCe 90ch","1.0 TCe 100ch","1.2 16V 75ch","1.5 dCi 75ch","1.5 dCi 90ch","ECO-G 100ch","Stepway TCe 90ch","Stepway TCe 100ch"],
+    "Duster": ["1.0 TCe 90ch","1.0 TCe 100ch","1.3 TCe 130ch","1.3 TCe 150ch","1.5 dCi 85ch","1.5 dCi 110ch","ECO-G 100ch","TCe 130 4x4","TCe 150 4x4"],
+    "Logan": ["0.9 TCe 90ch","1.0 SCe 65ch","1.0 TCe 100ch","1.2 16V 75ch","1.5 dCi 75ch","1.5 dCi 90ch"],
+    "Lodgy": ["1.0 TCe 100ch","1.2 TCe 115ch","1.5 dCi 90ch","1.5 dCi 110ch","ECO-G 100ch"],
+    "Dokker": ["1.2 TCe 115ch","1.5 dCi 75ch","1.5 dCi 90ch","1.5 dCi 110ch"],
+    "Spring": ["Electric 33ch","Electric 45ch","Electric Extreme 65ch"],
+    "Jogger": ["1.0 TCe 100ch","1.0 TCe 110ch","ECO-G 100ch","1.5 dCi 115ch"]
+  },
+  "Kia": {
+    "Ceed": ["1.0 T-GDi 100ch","1.0 T-GDi 120ch","1.4 T-GDi 140ch","1.5 T-GDi 160ch","GT 1.6 T-GDi 204ch","1.4 CRDi 90ch","1.4 CRDi 115ch","1.6 CRDi 115ch","1.6 CRDi 136ch"],
+    "Sportage": ["1.6 T-GDi 150ch","1.6 T-GDi 177ch","1.6 T-GDi 230ch PHEV","2.0 MPi 163ch","1.6 CRDi 115ch","1.6 CRDi 136ch","2.0 CRDi 136ch","2.0 CRDi 184ch","1.6 Hybrid 226ch","1.6 PHEV 265ch"],
+    "Picanto": ["1.0 MPI 67ch","1.0 MPI 69ch","1.0 T-GDi 100ch","1.2 CVVT 85ch"],
+    "Niro": ["1.6 GDi Hybrid 141ch","1.6 GDi Plug-in 141ch","EV Electric 204ch"],
+    "Sorento": ["1.6 T-GDi Hybrid 230ch","1.6 T-GDi PHEV 265ch","2.2 CRDi 200ch","2.2 CRDi 190ch"],
+    "Stinger": ["2.0 T-GDi 255ch","3.3 T-GDi 370ch","GT 3.3 T-GDi 366ch"],
+    "EV6": ["Standard 168ch","Long Range 228ch","Long Range AWD 325ch","GT 585ch"]
+  },
+  "Hyundai": {
+    "i10": ["1.0 MPI 67ch","1.0 T-GDi 100ch","1.2 MPI 84ch","1.2 MPI 85ch"],
+    "i20": ["1.0 T-GDi 100ch","1.0 T-GDi 120ch","1.2 MPI 84ch","1.2 MPI 85ch","N 1.6 T-GDi 204ch","1.1 CRDi 75ch","1.4 CRDi 90ch"],
+    "i30": ["1.0 T-GDi 120ch","1.4 T-GDi 140ch","1.5 T-GDi 110ch","1.5 T-GDi 160ch","N 2.0 T-GDi 275ch","N 2.0 T-GDi 280ch","1.6 CRDi 110ch","1.6 CRDi 116ch","1.6 CRDi 136ch"],
+    "Tucson": ["1.6 T-GDi 150ch","1.6 T-GDi 177ch","1.6 T-GDi PHEV 230ch","1.6 Hybrid 230ch","2.0 MPI 156ch","1.6 CRDi 115ch","1.6 CRDi 136ch","2.0 CRDi 136ch","2.0 CRDi 186ch"],
+    "Kona": ["1.0 T-GDi 120ch","1.6 T-GDi 198ch","N 2.0 T-GDi 280ch","Electric 136ch","Electric 204ch","1.6 CRDi 115ch","1.6 CRDi 136ch"],
+    "Santa Fe": ["1.6 T-GDi Hybrid 230ch","1.6 T-GDi PHEV 265ch","2.2 CRDi 200ch","2.4 GDi 185ch","2.0 T-GDi 235ch"],
+    "Ioniq 5": ["Standard Range 168ch","Long Range AWD 325ch","Long Range RWD 228ch","N 650ch"]
+  },
+  "Seat": {
+    "Ibiza": ["1.0 MPI 75ch","1.0 MPI 80ch","1.0 EcoTSI 95ch","1.0 TSI 110ch","1.5 TSI 150ch","FR 1.5 TSI 150ch","1.6 TDI 80ch","1.6 TDI 95ch"],
+    "Leon": ["1.0 eTSI 110ch","1.5 TSI 130ch","1.5 TSI 150ch","1.5 eTSI 150ch","2.0 TSI 190ch","Cupra 2.0 TSI 265ch","Cupra 2.0 TSI 300ch","2.0 TDI 115ch","2.0 TDI 150ch","e-Hybrid 245ch"],
+    "Ateca": ["1.0 TSI 115ch","1.5 TSI 150ch","2.0 TSI 190ch","Cupra 2.0 TSI 300ch","2.0 TDI 115ch","2.0 TDI 150ch","1.6 TDI 115ch"],
+    "Arona": ["1.0 TSI 95ch","1.0 TSI 110ch","1.0 EcoTSI 110ch","1.5 TSI 150ch","FR 1.5 TSI 150ch","1.6 TDI 95ch"],
+    "Tarraco": ["1.5 TSI 150ch","2.0 TSI 190ch","Cupra Formentor 310ch","1.5 TGI 130ch","2.0 TDI 150ch","2.0 TDI 190ch","e-Hybrid 245ch"]
+  },
+  "Skoda": {
+    "Fabia": ["1.0 MPI 65ch","1.0 MPI 75ch","1.0 TSI 95ch","1.0 TSI 110ch","1.5 TSI 150ch","Monte Carlo 1.5 TSI 150ch","1.4 TDI 90ch","1.6 TDI 90ch","1.6 TDI 95ch"],
+    "Octavia": ["1.0 TSI 115ch","1.5 TSI 150ch","2.0 TSI 190ch","RS 2.0 TSI 245ch","RS 2.0 TDI 200ch","iV 1.4 TSI PHEV 204ch","iV RS 245ch","1.6 TDI 115ch","2.0 TDI 115ch","2.0 TDI 150ch"],
+    "Karoq": ["1.0 TSI 115ch","1.5 TSI 150ch","2.0 TSI 190ch","2.0 TSI 4x4 190ch","1.6 TDI 115ch","2.0 TDI 115ch","2.0 TDI 150ch"],
+    "Kodiaq": ["1.5 TSI 150ch","2.0 TSI 180ch","2.0 TSI 190ch","RS 2.0 TSI 245ch","2.0 TDI 150ch","2.0 TDI 4x4 150ch","2.0 TDI 200ch"],
+    "Superb": ["1.4 TSI DSG 150ch","1.5 TSI 150ch","2.0 TSI 280ch","iV 1.4 TSI PHEV 218ch","2.0 TDI 150ch","2.0 TDI 190ch","3.6 FSI V6 260ch"],
+    "Scala": ["1.0 TSI 95ch","1.0 TSI 116ch","1.5 TSI 150ch","Monte Carlo 1.5 TSI 150ch","1.6 TDI 115ch"]
+  },
+  "Fiat": {
+    "500": ["0.9 TwinAir 65ch","0.9 TwinAir 85ch","1.0 Hybrid 70ch","1.2 69ch","1.4 100ch","Abarth 595 140ch","Abarth 695 160ch","Abarth 695 180ch","500e Electric 87ch","500e Electric 118ch","1.3 Multijet 75ch","1.3 Multijet 95ch"],
+    "Panda": ["0.9 TwinAir 65ch","0.9 TwinAir 85ch","1.0 Hybrid 70ch","1.2 69ch","4x4 0.9 TwinAir 85ch","1.3 Multijet 75ch","1.3 Multijet 95ch"],
+    "Tipo": ["1.0 GSE 100ch","1.4 95ch","1.6 Multijet 95ch","1.6 Multijet 120ch","2.0 Multijet 150ch","Cross 1.0 100ch"],
+    "500X": ["1.0 FireFly 120ch","1.3 FireFly 150ch","1.5 Hybrid 130ch","1.6 Multijet 120ch","2.0 Multijet 140ch"],
+    "Ducato": ["2.0 Multijet 115ch","2.0 Multijet 122ch","2.3 Multijet 120ch","2.3 Multijet 130ch","2.3 Multijet 140ch","2.3 Multijet 160ch","2.3 Multijet 180ch","Electric 90kWh 122ch"],
+    "Doblo": ["1.0 FireFly 100ch","1.3 Multijet 90ch","1.6 Multijet 120ch","2.0 Multijet 135ch","Electric 100ch"]
+  },
+  "Nissan": {
+    "Micra": ["0.9 IG-T 90ch","1.0 IG-T 100ch","1.0 IG-T 117ch","1.2 80ch","1.5 dCi 90ch"],
+    "Juke": ["1.0 DIG-T 117ch","1.0 DIG-T 114ch","1.2 DIG-T 115ch","1.6 116ch","1.6 DIG-T Nismo 214ch","1.5 dCi 110ch","Hybrid 143ch","N-Sport 1.0 DIG-T 114ch"],
+    "Qashqai": ["1.2 DIG-T 115ch","1.3 DIG-T 140ch","1.3 DIG-T 158ch","1.5 e-Power 190ch","1.3 MHEV 140ch","Plug-in Hybrid 190ch","1.6 dCi 130ch","2.0 dCi 150ch"],
+    "X-Trail": ["1.5 e-Power 204ch","1.5 e-Power AWD 213ch","1.6 DIG-T 163ch","2.0 DIG-T 177ch","1.6 dCi 130ch","2.0 dCi 177ch"],
+    "Leaf": ["40 kWh 150ch","62 kWh e+ 217ch","24 kWh 109ch","30 kWh 109ch"],
+    "Navara": ["2.3 dCi 160ch","2.3 dCi 163ch","2.3 BiTurbo 190ch","N-Guard 2.3 dCi 190ch"]
+  },
+  "Honda": {
+    "Civic": ["1.0 VTEC Turbo 126ch","1.5 VTEC Turbo 182ch","2.0 e:HEV 184ch","Type R FK2 310ch","Type R FK8 320ch","Type R FL5 329ch","1.6 i-DTEC 120ch"],
+    "Jazz": ["1.2 i-VTEC 90ch","1.3 i-VTEC 102ch","1.5 i-MMD Hybrid 109ch","e:HEV 109ch"],
+    "CR-V": ["1.5 VTEC Turbo 173ch","2.0 i-MMD Hybrid 184ch","e:HEV 184ch","e:PHEV 184ch","2.0 i-DTEC 150ch"],
+    "HR-V": ["1.5 i-VTEC 130ch","1.5 e:HEV 131ch","1.8 i-VTEC 141ch"],
+    "Accord": ["2.0 i-VTEC 155ch","2.4 i-VTEC 190ch","2.0 i-MMD Hybrid 215ch","2.2 i-DTEC 180ch"]
+  },
+  "Mazda": {
+    "2": ["1.5 Skyactiv-G 75ch","1.5 Skyactiv-G 90ch","1.5 Skyactiv-G 115ch","1.5 Hybrid 116ch","1.5 Skyactiv-D 105ch"],
+    "3": ["1.5 Skyactiv-G 100ch","2.0 Skyactiv-G 120ch","2.0 Skyactiv-G 150ch","2.0 Skyactiv-X 180ch","2.0 e-Skyactiv-X 186ch","1.8 Skyactiv-D 116ch","2.0 Skyactiv-D 150ch"],
+    "6": ["2.0 Skyactiv-G 145ch","2.0 Skyactiv-G 165ch","2.5 Skyactiv-G 194ch","2.5 Turbo 230ch","2.2 Skyactiv-D 150ch","2.2 Skyactiv-D 175ch"],
+    "CX-5": ["2.0 Skyactiv-G 165ch","2.5 Skyactiv-G 194ch","2.5 Turbo 230ch","2.2 Skyactiv-D 150ch","2.2 Skyactiv-D 175ch"],
+    "CX-30": ["2.0 Skyactiv-G 122ch","2.0 Skyactiv-X 180ch","2.0 e-Skyactiv-G 150ch","2.0 e-Skyactiv-X 186ch","1.8 Skyactiv-D 116ch"],
+    "MX-5": ["1.5 Skyactiv-G 131ch","1.5 Skyactiv-G 132ch","2.0 Skyactiv-G 160ch","2.0 Skyactiv-G 184ch"]
   },
   "Volvo": {
-    "C30": y(2006,2013), "C40": y(2021,2023), "C70": y(1997,2013),
-    "S40": y(1995,2012), "S60": y(2000,2023), "S80": y(1998,2016),
-    "S90": y(1996,2023), "V40": y(1995,2019), "V50": y(2004,2012),
-    "V60": y(2010,2023), "V70": y(1996,2016), "V90": y(1996,2023),
-    "XC40": y(2017,2023), "XC60": y(2008,2023), "XC70": y(2000,2016),
-    "XC90": y(2002,2023)
+    "V40": ["T2 122ch","T3 152ch","T4 190ch","T5 250ch","D2 120ch","D3 150ch","D4 190ch"],
+    "V60": ["B3 163ch","B4 197ch","B5 250ch","B6 300ch","T6 Recharge 340ch","T8 Recharge 390ch","D3 150ch","D4 190ch","D5 235ch"],
+    "V90": ["B4 197ch","B5 250ch","T6 Recharge 340ch","T8 Recharge 390ch","D4 190ch","D5 235ch"],
+    "XC40": ["B3 163ch","B4 211ch","B5 250ch","T5 Recharge 262ch","T4 190ch","D3 150ch","D4 190ch","Recharge Twin Pure Electric 408ch","Recharge Single 231ch"],
+    "XC60": ["B4 197ch","B5 250ch","B6 300ch","T6 Recharge 340ch","T8 Recharge 390ch","T8 Recharge 455ch","D4 190ch","D5 235ch","R-Design T8 390ch"],
+    "XC90": ["B5 250ch","B6 300ch","T8 Recharge 390ch","T8 Recharge Excellence 407ch","D5 235ch","D4 190ch"],
+    "S60": ["B3 163ch","B4 197ch","T5 250ch","T6 Polestar 367ch","T8 Recharge 390ch","D4 190ch"]
+  },
+  "Mini": {
+    "Hatch": ["One 75ch","One D 95ch","Cooper 136ch","Cooper S 178ch","Cooper S 192ch","John Cooper Works 231ch","JCW GP 306ch","Cooper D 90ch","Cooper D 116ch","Cooper SD 136ch"],
+    "Countryman": ["One 102ch","Cooper 136ch","Cooper S 178ch","JCW 231ch","Cooper D 116ch","Cooper SD 143ch","SE Countryman PHEV 224ch","JCW Countryman PHEV 306ch"],
+    "Clubman": ["One 102ch","Cooper 136ch","Cooper S 192ch","JCW 231ch","Cooper D 116ch","Cooper SD 150ch"],
+    "Cabrio": ["Cooper 136ch","Cooper S 192ch","JCW 231ch","Cooper D 116ch"]
+  },
+  "Subaru": {
+    "Impreza": ["1.6 i-S 114ch","2.0 i-S 156ch","WRX 2.5 Turbo 224ch","WRX STI 2.5 Turbo 300ch"],
+    "Forester": ["2.0 e-Boxer 150ch","2.0 DIT 240ch","2.0 i-L 150ch","2.5 i 173ch"],
+    "Outback": ["2.5 i 175ch","2.0 e-Boxer 150ch","3.6 R 256ch"],
+    "XV": ["1.6 i-L 114ch","2.0 i-S 156ch","2.0 e-Boxer 150ch"]
+  },
+  "Suzuki": {
+    "Swift": ["1.0 Boosterjet 111ch","1.2 Hybrid 83ch","1.2 Dualjet 90ch","1.4 Boosterjet Sport 140ch","1.6 VVT Sport 136ch","1.3 DDiS 75ch"],
+    "Vitara": ["1.0 Boosterjet 111ch","1.4 Boosterjet 129ch","1.4 Boosterjet 140ch","1.6 115ch","1.4 Hybrid 129ch","1.5 Hybrid 100ch","1.6 DDiS 120ch"],
+    "S-Cross": ["1.0 Boosterjet 111ch","1.4 Boosterjet 129ch","1.4 Hybrid 129ch","1.5 Hybrid 115ch","1.6 DDiS 120ch"],
+    "Jimny": ["1.3 VVT 85ch","1.5 AllGrip 102ch"],
+    "Ignis": ["1.2 Dualjet 90ch","1.2 Hybrid 83ch"]
+  },
+  "Porsche": {
+    "911": ["Carrera 3.0 385ch","Carrera S 3.0 450ch","Carrera 4 3.0 385ch","Carrera 4S 3.0 450ch","Carrera T 3.0 385ch","GT3 4.0 510ch","GT3 RS 4.0 525ch","Turbo 3.8 580ch","Turbo S 3.8 650ch","GTS 3.0 480ch"],
+    "Cayenne": ["3.0 340ch","3.0 E-Hybrid 462ch","Turbo 4.0 550ch","Turbo S E-Hybrid 680ch","GTS 4.0 460ch","S 2.9 440ch"],
+    "Macan": ["2.0 265ch","S 3.0 380ch","GTS 2.9 440ch","Turbo 2.9 440ch","Electric Standard 408ch","Electric Performance 639ch"],
+    "Taycan": ["Standard 408ch","4S 571ch","Turbo 625ch","Turbo S 761ch","Sport Turismo 4S 571ch"]
+  },
+  "Land Rover": {
+    "Range Rover Evoque": ["P200 200ch","P250 250ch","P300 300ch","P300e 309ch","D150 150ch","D165 163ch","D200 200ch"],
+    "Range Rover Sport": ["P400 400ch","P530 530ch","P440e 440ch","D250 249ch","D350 350ch","SVR 5.0 575ch"],
+    "Discovery Sport": ["P200 200ch","P250 250ch","P300e 309ch","D150 150ch","D165 163ch","D200 200ch"],
+    "Defender": ["P300 300ch","P400 400ch","P525 V8 525ch","D200 200ch","D250 250ch","D300 300ch"]
+  },
+  "Jeep": {
+    "Renegade": ["1.0 T3 120ch","1.3 T4 150ch","1.3 T4 180ch","4xe PHEV 240ch","1.6 Multijet 120ch","2.0 Multijet 140ch"],
+    "Compass": ["1.3 T4 130ch","1.3 T4 150ch","1.3 T4 190ch","4xe PHEV 240ch","1.6 Multijet 120ch","2.0 Multijet 140ch","2.0 Multijet 170ch"],
+    "Grand Cherokee": ["2.0 Turbo 272ch","3.6 V6 286ch","5.7 V8 357ch","4xe PHEV 375ch","3.0 CRD 250ch","Summit 5.7 V8 357ch"],
+    "Wrangler": ["2.0 T 272ch","3.6 V6 284ch","2.0 4xe PHEV 380ch","Rubicon 392 V8 470ch"]
   }
 };
 
+// ─── WIZARD ───
+let currentStep = 1;
+
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  document.getElementById('step' + currentStep).style.display = 'none';
+  const next = document.getElementById('step' + n);
+  next.style.display = 'block';
+  next.classList.remove('step-content');
+  void next.offsetWidth;
+  next.classList.add('step-content');
+  updateProgress(n);
+  currentStep = n;
+}
+
+function updateProgress(n) {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('dot' + i);
+    const lbl = document.getElementById('lbl' + i);
+    if (i < n) { dot.className = 'prog-dot done'; dot.textContent = '✓'; lbl.className = 'prog-label'; }
+    else if (i === n) { dot.className = 'prog-dot active'; dot.textContent = i; lbl.className = 'prog-label active'; }
+    else { dot.className = 'prog-dot'; dot.textContent = i; lbl.className = 'prog-label'; }
+  }
+  document.getElementById('line1').className = 'prog-line' + (n > 1 ? ' done' : '');
+  document.getElementById('line2').className = 'prog-line' + (n > 2 ? ' done' : '');
+}
+
+function validateStep(step) {
+  if (step === 1) {
+    if (!document.getElementById('client').value.trim()) {
+      document.getElementById('client').focus();
+      document.getElementById('client').style.borderColor = 'var(--red)';
+      setTimeout(() => document.getElementById('client').style.borderColor = '', 2000);
+      return false;
+    }
+  }
+  if (step === 2) {
+    const missing = ['immat','marque','modele','annee'].find(id => !document.getElementById(id).value.trim());
+    if (missing) {
+      document.getElementById(missing).focus();
+      document.getElementById(missing).style.borderColor = 'var(--red)';
+      setTimeout(() => document.getElementById(missing).style.borderColor = '', 2000);
+      return false;
+    }
+  }
+  if (step === 3) {
+    if (!document.getElementById('description').value.trim()) {
+      document.getElementById('description').focus();
+      document.getElementById('description').style.borderColor = 'var(--red)';
+      setTimeout(() => document.getElementById('description').style.borderColor = '', 2000);
+      return false;
+    }
+  }
+  return true;
+}
+
+function selectType(type) {
+  document.getElementById('typeClient').value = type;
+  document.getElementById('btn-individual').className = 'type-btn' + (type === 'individual' ? ' selected' : '');
+  document.getElementById('btn-company').className = 'type-btn' + (type === 'company' ? ' selected' : '');
+}
+
+// ─── VOITURES ───
 function initMarques() {
   const sel = document.getElementById('marque');
   Object.keys(VOITURES).sort().forEach(m => {
@@ -518,6 +636,7 @@ function updateModeles() {
   selM.innerHTML = '<option value="">— Sélectionner —</option>';
   selA.innerHTML = '<option value="">— Choisir un modèle —</option>';
   selA.disabled = true;
+  document.getElementById('motorisation-list').innerHTML = '';
   if (!marque) { selM.disabled = true; return; }
   selM.disabled = false;
   Object.keys(VOITURES[marque]).sort().forEach(mod => {
@@ -542,175 +661,141 @@ function updateAnnees() {
   });
 }
 
+function updateMotorisations() {
+  const marque = document.getElementById('marque').value;
+  const modele = document.getElementById('modele').value;
+  const list = document.getElementById('motorisation-list');
+  list.innerHTML = '';
+  const mots = (MOTORISATIONS[marque] && MOTORISATIONS[marque][modele]) || [];
+  mots.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m;
+    list.appendChild(opt);
+  });
+  document.getElementById('motorisation').value = '';
+}
+
 initMarques();
 
+// ─── URLS ───
 const WEBHOOK_URL = '/api/devis';
 const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/2vtig2ut4q7flujmir9ji32cwwm5t1v5';
+let currentDevis = null;
 
-  let currentDevis = null;
+// ─── LOADING ───
+const loadingSteps = ['Analyse de la panne...','Identification des pièces...','Calcul des prix...','Mise en forme du devis...'];
+let stepIdx = 0, stepTimer;
+function startStepAnimation() { stepIdx = 0; document.getElementById('loadingStep').textContent = loadingSteps[0]; stepTimer = setInterval(() => { stepIdx = (stepIdx+1)%loadingSteps.length; document.getElementById('loadingStep').textContent = loadingSteps[stepIdx]; }, 1800); }
+function stopStepAnimation() { clearInterval(stepTimer); }
 
-  const steps = [
-    'Analyse de la panne...',
-    'Identification des pièces...',
-    'Calcul des prix...',
-    'Mise en forme du devis...'
-  ];
-  let stepIndex = 0;
-  let stepInterval;
-
-  function startStepAnimation() {
-    stepIndex = 0;
-    document.getElementById('loadingStep').textContent = steps[0];
-    stepInterval = setInterval(() => {
-      stepIndex = (stepIndex + 1) % steps.length;
-      document.getElementById('loadingStep').textContent = steps[stepIndex];
-    }, 1800);
-  }
-
-  function stopStepAnimation() {
-    clearInterval(stepInterval);
-  }
-
-  function show(id) {
-    ['formCard', 'loadingCard', 'resultCard'].forEach(c => {
-      document.getElementById(c).style.display = c === id ? 'block' : 'none';
-    });
-    if (id === 'loadingCard') {
-      document.getElementById('loadingCard').style.display = 'flex';
-      document.getElementById('loadingCard').style.flexDirection = 'column';
-      document.getElementById('loadingCard').style.alignItems = 'center';
-    }
-  }
-
-  document.getElementById('devisForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const payload = {
-      client: document.getElementById('client').value,
-      typeClient: document.getElementById('typeClient').value,
-      pays: document.getElementById('pays').value,
-      immat: document.getElementById('immat').value,
-      marque: document.getElementById('marque').value,
-      modele: document.getElementById('modele').value,
-      annee: document.getElementById('annee').value,
-      motorisation: document.getElementById('motorisation').value,
-      carburant: document.getElementById('carburant').value,
-      description: document.getElementById('description').value,
-      km: document.getElementById('km').value,
-    };
-
-    show('loadingCard');
-    startStepAnimation();
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
-      const res = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-
-      const data = await res.json();
-      stopStepAnimation();
-      displayResult(payload, data);
-    } catch (err) {
-      stopStepAnimation();
-      alert('Erreur lors de la génération. Vérifiez votre connexion.');
-      show('formCard');
-    }
+function show(id) {
+  ['formCard','loadingCard','resultCard'].forEach(c => {
+    const el = document.getElementById(c);
+    el.style.display = 'none';
   });
+  const target = document.getElementById(id);
+  target.style.display = (id === 'loadingCard') ? 'flex' : 'block';
+  if (id === 'loadingCard') target.style.flexDirection = 'column', target.style.alignItems = 'center';
+}
 
-  function displayResult(input, data) {
-    currentDevis = { input, data };
+// ─── SUBMIT ───
+async function submitDevis() {
+  if (!validateStep(3)) return;
 
-    document.getElementById('resultMeta').textContent =
-      `${input.client} · ${input.marque} ${input.modele} · ${input.immat}`;
+  const payload = {
+    client: document.getElementById('client').value,
+    typeClient: document.getElementById('typeClient').value,
+    pays: document.getElementById('pays').value,
+    immat: document.getElementById('immat').value,
+    marque: document.getElementById('marque').value,
+    modele: document.getElementById('modele').value,
+    annee: document.getElementById('annee').value,
+    motorisation: document.getElementById('motorisation').value,
+    carburant: document.getElementById('carburant').value,
+    description: document.getElementById('description').value,
+    km: document.getElementById('km').value,
+  };
 
-    const tbody = document.getElementById('devisBody');
-    tbody.innerHTML = '';
+  show('loadingCard');
+  startStepAnimation();
 
-    let total = 0;
-    data.lignes.forEach(ligne => {
-      const lineTotal = ligne.quote_quantity * ligne.item_net_price;
-      total += lineTotal;
-      tbody.innerHTML += `
-        <tr>
-          <td>
-            <strong>${ligne.item_name}</strong><br>
-            <span style="font-size:11px;color:#94a3b8;">${ligne.detail || ''}</span>
-          </td>
-          <td>${ligne.quote_quantity}</td>
-          <td>${ligne.item_net_price.toFixed(2)} €</td>
-          <td>${lineTotal.toFixed(2)} €</td>
-        </tr>`;
-    });
-
-    const tva = total * 0.20;
-    const ttc = total + tva;
-    document.getElementById('totalHT').textContent = total.toFixed(2) + ' €';
-    document.getElementById('totalTVA').textContent = tva.toFixed(2) + ' €';
-    document.getElementById('totalTTC').textContent = ttc.toFixed(2) + ' €';
-
-    const remarquesEl = document.getElementById('remarques');
-    if (data.remarques) {
-      remarquesEl.textContent = '💡 ' + data.remarques;
-      remarquesEl.style.display = 'block';
-    } else {
-      remarquesEl.style.display = 'none';
-    }
-
-    document.getElementById('tiimeStatus').style.display = 'none';
-
-    show('resultCard');
-    document.getElementById('resultCard').style.display = 'block';
-  }
-
-  async function sendToTiime() {
-    const btn = document.getElementById('tiimeBtn');
-    const status = document.getElementById('tiimeStatus');
-
-    btn.disabled = true;
-    btn.innerHTML = '⏳ Envoi en cours...';
-
-    try {
-      const res = await fetch(MAKE_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentDevis)
-      });
-
-      status.style.display = 'block';
-      if (res.ok) {
-        status.className = 'tiime-status success';
-        status.textContent = '✅ Devis envoyé dans Tiime avec succès';
-        btn.innerHTML = '✅ Envoyé';
-      } else {
-        throw new Error('HTTP ' + res.status);
-      }
-    } catch (err) {
-      status.style.display = 'block';
-      status.className = 'tiime-status error';
-      status.textContent = '❌ Erreur lors de l\'envoi. Réessayez.';
-      btn.disabled = false;
-      btn.innerHTML = '📄 Envoyer dans Tiime';
-    }
-  }
-
-  function resetForm() {
-    document.getElementById('devisForm').reset();
-    currentDevis = null;
-    const btn = document.getElementById('tiimeBtn');
-    btn.disabled = false;
-    btn.innerHTML = '🔗 Envoyer dans Tiime';
-    document.getElementById('tiimeStatus').style.display = 'none';
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+    const res = await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), signal:controller.signal });
+    clearTimeout(timeout);
+    const data = await res.json();
+    stopStepAnimation();
+    displayResult(payload, data);
+  } catch(err) {
+    stopStepAnimation();
+    alert('Erreur lors de la génération. Vérifiez votre connexion.');
     show('formCard');
   }
+}
 
+// ─── RESULT ───
+function displayResult(input, data) {
+  currentDevis = { input, data };
+  document.getElementById('resultMeta').textContent = `${input.client} · ${input.marque} ${input.modele} · ${input.immat}`;
+  const tbody = document.getElementById('devisBody');
+  tbody.innerHTML = '';
+  let total = 0;
+  data.lignes.forEach(ligne => {
+    const lineTotal = ligne.quote_quantity * ligne.item_net_price;
+    total += lineTotal;
+    tbody.innerHTML += `<tr><td><strong>${ligne.item_name}</strong><br><span style="font-size:11px;color:#94a3b8;">${ligne.detail||''}</span></td><td>${ligne.quote_quantity}</td><td>${ligne.item_net_price.toFixed(2)} €</td><td>${lineTotal.toFixed(2)} €</td></tr>`;
+  });
+  const tva = total * 0.20;
+  document.getElementById('totalHT').textContent = total.toFixed(2)+' €';
+  document.getElementById('totalTVA').textContent = tva.toFixed(2)+' €';
+  document.getElementById('totalTTC').textContent = (total+tva).toFixed(2)+' €';
+  const rem = document.getElementById('remarques');
+  if (data.remarques) { rem.textContent = '💡 '+data.remarques; rem.style.display = 'block'; } else { rem.style.display = 'none'; }
+  document.getElementById('tiimeStatus').style.display = 'none';
+  show('resultCard');
+}
+
+async function sendToTiime() {
+  const btn = document.getElementById('tiimeBtn');
+  const status = document.getElementById('tiimeStatus');
+  btn.disabled = true; btn.innerHTML = '⏳ Envoi en cours...';
+  try {
+    const res = await fetch(MAKE_WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(currentDevis) });
+    status.style.display = 'block';
+    if (res.ok) { status.className = 'tiime-status success'; status.textContent = '✅ Devis envoyé dans Tiime avec succès'; btn.innerHTML = '✅ Envoyé'; }
+    else throw new Error('HTTP '+res.status);
+  } catch(err) {
+    status.style.display = 'block'; status.className = 'tiime-status error'; status.textContent = '❌ Erreur lors de l\'envoi. Réessayez.';
+    btn.disabled = false; btn.innerHTML = '🔗 Envoyer dans Tiime';
+  }
+}
+
+function resetForm() {
+  currentStep = 1;
+  goStep(1);
+  document.getElementById('client').value = '';
+  document.getElementById('typeClient').value = 'individual';
+  selectType('individual');
+  document.getElementById('pays').value = 'FR';
+  document.getElementById('immat').value = '';
+  document.getElementById('km').value = '';
+  document.getElementById('marque').value = '';
+  document.getElementById('modele').innerHTML = '<option value="">— Choisir une marque —</option>';
+  document.getElementById('modele').disabled = true;
+  document.getElementById('annee').innerHTML = '<option value="">— Choisir un modèle —</option>';
+  document.getElementById('annee').disabled = true;
+  document.getElementById('carburant').value = 'Essence';
+  document.getElementById('motorisation').value = '';
+  document.getElementById('description').value = '';
+  document.getElementById('motorisation-list').innerHTML = '';
+  currentDevis = null;
+  document.getElementById('tiimeBtn').disabled = false;
+  document.getElementById('tiimeBtn').innerHTML = '🔗 Envoyer dans Tiime';
   show('formCard');
-</script>
+}
 
+show('formCard');
+</script>
 </body>
 </html>

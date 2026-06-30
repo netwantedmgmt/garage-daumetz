@@ -16,7 +16,14 @@ Véhicule : ${marque} ${modele}${motorisation ? ` — Motorisation : ${motorisat
 Client : ${client}
 Intervention : ${description}
 
-Taux horaire main d'œuvre : 65 €/h. Prix HT uniquement. Sépare pièces et main d'œuvre. Maximum 10 lignes.
+Prix HT uniquement. Sépare pièces et main d'œuvre. Maximum 10 lignes.
+
+Taux horaire main d'œuvre selon le type d'intervention :
+- T1 = 60€/h : entretien courant (vidange, filtres, freins, pneus, ampoules, échappement, nettoyage, petites interventions)
+- T2 = 70€/h : diagnostic & mécanique technique (distribution, embrayage, suspension, diagnostic électronique, recherche de panne, climatisation)
+- T3 = 90€/h : intervention lourde & expertise (gros démontage moteur, boîte de vitesses, soudure, panne complexe, interventions spécifiques)
+
+Applique le bon taux selon la nature de chaque ligne de main d'œuvre. Les pièces sont facturées au prix catalogue.
 Pour le champ "quote_quantity_unit_of_measure_code", utilise UNIQUEMENT ces valeurs exactes : "heure" (main d'œuvre/travail), "article" (pièces/fournitures), "forfait" (prestation forfaitaire), "litre" (liquides/fluides).
 
 {"lignes":[{"item_name":"...","detail":"...","quote_quantity":1,"quote_quantity_unit_of_measure_code":"article","item_net_price":0.00}],"remarques":"..."}`;
